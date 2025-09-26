@@ -17,4 +17,8 @@ public class UserDto
     /// The user email
     /// </summary>
     public string Email { get; set; } = string.Empty;
+    /// <summary>
+    /// The user state
+    /// </summary>
+    public UserStateEnumDto State { get; set; }
 }

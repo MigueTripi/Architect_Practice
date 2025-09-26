@@ -16,4 +16,8 @@ public class User
     /// The user email
     /// </summary>
     public string Email { get; set; } = string.Empty;
+    /// <summary>
+    /// The user state
+    /// </summary>
+    public UserStateEnum State { get; set; } = UserStateEnum.Active;
 }
