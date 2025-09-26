@@ -7,7 +7,7 @@ namespace SelfResearch.UserManagement.API.Test.Features.UserManagement;
 public class UserManagementServiceTest
 {
     private Mock<IUserManagementRepository> _userManagementRepositoryMock = new();
-    private Mock<IMapper> _mapperMock = new(); 
+    private Mock<IMapper> _mapperMock = new();
 
     [Fact]
     public async Task GetUserAsync_WithNonExistentId_ReturnsNull()
@@ -29,7 +29,7 @@ public class UserManagementServiceTest
     public async Task GetUserAsync_WithValidId_ReturnsUser()
     {
         // Arrange
-        var testUser = new User { Id = 1, Name = "Test User" };
+        var testUser = new User { Id = 1, Name = "Test User", Email = "m@mail.net", State = UserStateEnum.Active };
         _userManagementRepositoryMock.Setup(x => x.GetUserAsync(1))
             .ReturnsAsync(testUser);
 
@@ -42,27 +42,25 @@ public class UserManagementServiceTest
                 State = (UserStateEnumDto)source.State
             });
         var service = GetNewValidService();
-        
+
         // Act
         var result = await service.GetUserAsync(1);
 
         // Assert
         Assert.NotNull(result);
-        Assert.Equal(testUser.Id, result.Id);
-        Assert.Equal(testUser.Name, result.Name);
-        Assert.Equal((int)testUser.State, (int)result.State);
+        AssertUserData(result, testUser);
     }
 
     [Fact]
     public async Task GetPagedUsersAsync_ReturnsPagedUsers()
     {
         // Arrange
-        var users = new List<User> 
-        { 
-            new User { Id = 1, Name = "User1" },
-            new User { Id = 2, Name = "User2" }
+        var users = new List<User>
+        {
+            new User { Id = 1, Name = "User1", Email = "m1@mail.net", State = UserStateEnum.Active },
+            new User { Id = 1, Name = "User2", Email = "m2@mail.net", State = UserStateEnum.Active },
         };
-        
+
         _userManagementRepositoryMock.Setup(x => x.GetPagedUsersAsync(It.IsAny<int>(), It.IsAny<int>()))
             .ReturnsAsync(users);
 
@@ -82,7 +80,7 @@ public class UserManagementServiceTest
 
         // Assert
         Assert.Equal(2, result.Count);
-        Assert.Equal(users[0].Name, result[0].Name);
+        AssertUserData(result[0], users[0]);
     }
 
     [Fact]
@@ -165,7 +163,7 @@ public class UserManagementServiceTest
     public async Task PatchUserAsync_WithExistingUser_ReturnsUpdatedUserEmail()
     {
         // Arrange
-        var userDto = new UserDto { Id = 1, Name = "Updated User", Email = "updated@test.com", State = UserStateEnumDto.Inactive };
+        var userDto = new UserDto { Id = 1, Name = "Original User", Email = "updated@test.com", State = UserStateEnumDto.Inactive };
         var existingUser = new User { Id = 1, Name = "Original User", Email = "original@test.com", State = UserStateEnum.Inactive };
         var patchDoc = new Microsoft.AspNetCore.JsonPatch.JsonPatchDocument<UserDto>();
         patchDoc.Replace(u => u.Email, userDto.Email);
@@ -181,7 +179,7 @@ public class UserManagementServiceTest
                 Id = source.Id,
                 Name = source.Name,
                 Email = source.Email,
-                State = (UserStateEnumDto)source.State 
+                State = (UserStateEnumDto)source.State
             });
 
         var service = GetNewValidService();
@@ -234,5 +232,13 @@ public class UserManagementServiceTest
     private UserManagementService GetNewValidService()
     {
         return new UserManagementService(_userManagementRepositoryMock.Object, this._mapperMock.Object);
+    }
+    
+    private void AssertUserData(UserDto dto, User user)
+    {
+        Assert.Equal(dto.Id, user.Id);
+        Assert.Equal(dto.Name, user.Name);
+        Assert.Equal(dto.Email, user.Email);
+        Assert.Equal((int)dto.State, (int)user.State);
     }
 }
