@@ -1,0 +1,51 @@
+services:
+  postgres:
+    container_name: UserManagementDB_Container
+    image: postgres:17-trixie
+    environment:
+      POSTGRES_DB: usermanagement_db
+      POSTGRES_USER: UM_DbUser
+      POSTGRES_PASSWORD: P455w0rd$
+    ports:
+      - "5432:5432"
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      retries: 5
+      start_period: 30s
+      timeout: 10s
+
+  usermanagement-webapi:
+    build:
+      context: .
+      dockerfile: Dockerfile.UserManagement.api
+    container_name: UserManagementAPI_Container
+    ports:
+      - "5266:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      ConnectionStrings__DefaultConnection: "Host=postgres;Port=5432;Database=usermanagement_db;Username=UM_DbUser;Password=P455w0rd$"
+      ASPNETCORE_URLS: "http://+:8080"
+      ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT}
+    networks:
+      - app-network
+
+  digitalwallet-web:
+    build:
+      context: .
+      dockerfile: Dockerfile.DigitalWallet.web
+    container_name: SelfResearchDigitalWalletWeb_Container
+    ports:
+      - "4222:4200"
+    depends_on:
+      - usermanagement-webapi
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge

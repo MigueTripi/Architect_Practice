@@ -1,0 +1,25 @@
+# build stage
+FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
+WORKDIR /src
+
+ARG BUILD_CONFIGURATION=Debug
+ENV BUILD_CONFIGURATION=$BUILD_CONFIGURATION
+
+# Install the EF Core tools
+RUN dotnet tool install --global dotnet-ef
+ENV PATH="$PATH:/root/.dotnet/tools"
+
+# Copy csproj and restore nuget packages
+COPY src/SelfResearch.UserManagement.API/SelfResearch.UserManagement.API.csproj src/SelfResearch.UserManagement.API/
+WORKDIR /src/src/SelfResearch.UserManagement.API/
+RUN dotnet restore SelfResearch.UserManagement.API.csproj
+
+# Copy the code, build and publish
+COPY src/SelfResearch.UserManagement.API/. .
+RUN dotnet publish SelfResearch.UserManagement.API.csproj -c $BUILD_CONFIGURATION -o /app/publish
+
+# Copy the published app and run the app.
+FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS final
+WORKDIR /app
+COPY --from=build /app/publish .
+ENTRYPOINT ["dotnet", "SelfResearch.UserManagement.API.dll"]
