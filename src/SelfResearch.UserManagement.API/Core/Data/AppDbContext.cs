@@ -13,19 +13,23 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
       {
             modelBuilder.Entity<User>(entity =>
             {
-                  entity.ToTable("users");
-                  entity.HasKey(e => e.Id).HasName("pk_users");
+              entity.ToTable("users");
+              entity.HasKey(e => e.Id).HasName("pk_users");
 
-                  entity.Property(e => e.Id)
-                    .HasColumnName("id");
+              entity.Property(e => e.Id)
+                .HasColumnName("id");
 
-                  entity.Property(e => e.Name)
-                    .HasColumnName("name")
-                    .IsRequired();
+              entity.Property(e => e.Name)
+                .HasColumnName("name")
+                .IsRequired();
 
-                  entity.Property(e => e.Email)
-                    .HasColumnName("email")
-                    .IsRequired();
+              entity.Property(e => e.Email)
+                .HasColumnName("email")
+                .IsRequired();
+                    
+              entity.Property(e => e.State)
+                .HasColumnName("state")
+                .IsRequired();
             });
       }
 }

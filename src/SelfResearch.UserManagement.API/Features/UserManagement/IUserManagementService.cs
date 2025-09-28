@@ -42,4 +42,12 @@ public interface IUserManagementService
     /// <param name="patchingDocument">The patching document</param>
     /// <returns>The updated user</returns>
     Task<UserDto?> PatchUserAsync(int id, JsonPatchDocument<UserDto> patchingDocument);
+
+    /// <summary>
+    /// Updates the state of a user.
+    /// </summary>
+    /// <param name="id">The user identifier</param>
+    /// <param name="newState">The newState</param>
+    /// <returns>The updated user</returns>
+    Task<UserDto?> UpdateUserStateAsync(int id, UserStateEnumDto newState);
 }
