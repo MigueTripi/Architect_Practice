@@ -3,14 +3,20 @@ using SelfResearch.UserManagement.API.Features.UserManagement;
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
 using SelfResearch.UserManagement.API.Mapping;
-using Microsoft.AspNetCore.Mvc.NewtonsoftJson;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.ConfigureHttpJsonOptions(options => 
+{
+    options.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
+    options.SerializerOptions.PropertyNamingPolicy = null;
+});
 
 // Add Cors policy to reach backend from Vue site.
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("EnablesVUEFrontend", builder =>
+    options.AddPolicy("EnablesFrontend", builder =>
     {
         builder.SetIsOriginAllowed(origin => true) // Allow any origin in development
                .AllowAnyHeader()
@@ -19,7 +25,7 @@ builder.Services.AddCors(options =>
     });
 });
 
-builder.Services.AddControllers().AddNewtonsoftJson();
+builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
@@ -42,7 +48,7 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     // CORS middleware to allow Vue frontend to access the API in development in development environment
-    app.UseCors("EnablesVUEFrontend");
+    app.UseCors("EnablesFrontend");
 
     app.MapOpenApi();
     app.MapScalarApiReference();

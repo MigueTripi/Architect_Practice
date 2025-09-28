@@ -53,6 +53,7 @@ namespace SelfResearch.UserManagement.API.Controllers
 
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<UserDto>> CreateUser([FromBody] UserDto user)
         {
             if (user == null)
@@ -96,7 +97,31 @@ namespace SelfResearch.UserManagement.API.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult<bool>> DeleteUser(int id)
         {
-            return await this._userManagementService.DeleteUserAsync(id);
+            return Ok(await this._userManagementService.DeleteUserAsync(id));
+        }
+
+        [HttpPut("{id}/state")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<UserDto>> UpdateUserState(int id, [FromBody] UserStateUpdateRequestDto stateUpdate)
+        {
+            if (id <= 0)
+            {
+                return BadRequest("Invalid user ID.");
+            }
+            if (stateUpdate == null)
+            {
+                return BadRequest("State update data is required.");
+            }
+
+            var updatedUser = await this._userManagementService.UpdateUserStateAsync(id, stateUpdate.UserState);
+            if (updatedUser == null)
+            {
+                return NotFound("User not found.");
+            }
+
+            return Ok(updatedUser);
         }
     }
 }

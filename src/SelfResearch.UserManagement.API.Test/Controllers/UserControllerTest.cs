@@ -186,11 +186,59 @@ public class UserControllerTest
         var result = await controller.DeleteUser(1);
 
         // Assert
-        Assert.True(result.Value);
+        var okResult = Assert.IsType<OkObjectResult>(result.Result);
+        Assert.True((bool)okResult.Value);
+    }
+
+    [Theory]
+    [InlineData(0, UserStateEnumDto.Active)]
+    [InlineData(-1, UserStateEnumDto.Active)]
+    [InlineData(1, null)]
+    public async Task UpdateStateAsync_WithInvalidRequest_ReturnsBadRequest(int userId, UserStateEnumDto? state)
+    {
+        // Arrange
+        var controller = GetNewValidController();
+
+        // Act
+        var result = await controller.UpdateUserState(userId, state == null ? null : new() { UserState = state.Value });
+
+        // Assert
+        Assert.IsType<BadRequestObjectResult>(result.Result);
+    }
+
+    [Fact]
+    public async Task UpdateStateAsync_WithInexistingUser_ReturnsNotFound()
+    {
+        // Arrange
+        _userManagementService.Setup(x => x.UpdateUserStateAsync(It.IsAny<int>(), It.IsAny<UserStateEnumDto>()))
+            .ReturnsAsync((UserDto?)null);
+        var controller = GetNewValidController();
+
+        // Act
+        var result = await controller.UpdateUserState(1, new() { UserState = UserStateEnumDto.Active });
+
+        // Assert
+        Assert.IsType<NotFoundObjectResult>(result.Result);
+    }
+
+    [Fact]
+    public async Task UpdateStateAsync_WithExistingUser_ReturnsOk()
+    {
+        // Arrange
+        _userManagementService.Setup(x => x.UpdateUserStateAsync(It.IsAny<int>(), It.IsAny<UserStateEnumDto>()))
+            .ReturnsAsync(new UserDto());
+        var controller = GetNewValidController();
+
+        // Act
+        var result = await controller.UpdateUserState(1, new() { UserState = UserStateEnumDto.Active });
+
+        // Assert
+        Assert.IsType<OkObjectResult>(result.Result);
     }
 
     private UserController GetNewValidController()
     {
         return new UserController(_loggerMock.Object, _userManagementService.Object);
     }
+
 }

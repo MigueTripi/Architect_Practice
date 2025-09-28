@@ -199,7 +199,7 @@ public class UserManagementServiceTest
     {
         // Arrange
         _userManagementRepositoryMock.Setup(x => x.GetUserAsync(It.IsAny<int>()))
-            .ReturnsAsync((User)null);
+            .ReturnsAsync((User?)null);
 
         var service = GetNewValidService();
 
@@ -227,6 +227,51 @@ public class UserManagementServiceTest
 
         // Assert
         Assert.True(result);
+        _userManagementRepositoryMock.Verify(x => x.DeleteUserAsync(1), Times.Once);
+    }
+
+    [Fact]
+    public async Task UpdateStateAsync_WithNonExistentUser_ReturnsNull()
+    {
+        // Arrange
+        _userManagementRepositoryMock.Setup(x => x.GetUserAsync(It.IsAny<int>()))
+            .ReturnsAsync((User?)null);
+
+        var service = GetNewValidService();
+
+        // Act
+        var result = await service.UpdateUserStateAsync(1, UserStateEnumDto.Active);
+
+        // Assert
+        Assert.Null(result);
+    }
+
+    [Fact]
+    public async Task UpdateStateAsync_WithExistentUser_ReturnsUser()
+    {
+        // Arrange
+        var user = new User { Id = 1, Name = "Test User", Email = "m@m.com", State = UserStateEnum.Active };
+        _userManagementRepositoryMock.Setup(x => x.GetUserAsync(It.IsAny<int>()))
+            .ReturnsAsync(user);
+        _userManagementRepositoryMock.Setup(x => x.UpdateUserAsync())
+            .Returns(Task.CompletedTask);
+        _mapperMock.Setup(x => x.Map<UserDto>(It.IsAny<User>()))
+            .Returns((User source) => new UserDto
+            {
+                Id = source.Id,
+                Name = source.Name,
+                Email = source.Email,
+                State = (UserStateEnumDto)source.State
+            });
+
+        var service = GetNewValidService();
+
+        // Act
+        var result = await service.UpdateUserStateAsync(1, UserStateEnumDto.Inactive);
+
+        // Assert
+        Assert.NotNull(result);
+        _userManagementRepositoryMock.Verify(x => x.UpdateUserAsync(), Times.Once);
     }
 
     private UserManagementService GetNewValidService()
