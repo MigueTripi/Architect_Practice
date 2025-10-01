@@ -24,15 +24,23 @@ The propose of this repository is to apply some key concept in the software engi
 
 ## Requirement understanding
 
-TBD
+Initially, I am going to create a new digital wallet platform where the users can register some payments to increase their balances, transfer it to another user.
+Also, user and wallet states will be handled in order to create some business validations. 
 
 ## Proposed solution
 
-TBD
+The system will, initially, have two microservices and one frontend to tackle the requirements. The system will be able to store users, their financial transactions, list them and handle the wallet's balance.
+
+Next steps:
+- Add security layer for the operations
+- Register users by external identity providers such as Google or any others.
+- Live balance updates using websockets
 
 ## Technical overview 
 
-TBD
+Each microservice will communicate with the other in an event based architecture. Also, the microservices will follow DDD approach, RESTFull standard and handle data persistence between different microservices. 
+The client web site is going to consume both microservices to show the required data and for creating the needed ones. 
+
 
 ### Technologies
 
@@ -49,7 +57,7 @@ The following is the tech slack for solving the challenge
 
 ## Run and test application
 
-### Web API
+### Web APIs
 
 For debugging API you could use Scalar adapter to test each functionality. Run manually `SelfResearch.UserManagement.API` project and browse this URL http://localhost:5262/scalar/.
 
@@ -76,7 +84,7 @@ Note 2: You also could run the application after deploying it on Docker. See the
 
 
 To run the application locally you might choose to mount Docker containers. At the moment, we have four different containers:
-- Postgres -> Hosting DB.
+- Postgres -> Hosting DBs.
 - WebApi -> Hosting the web api.
 - Web -> Hosting the Angular Web.
 - nginx -> TBD
@@ -96,7 +104,8 @@ There you have the step by step to setup the env from scratch:
 `./setup_local_env.sh`
 
 4) Validate everything is good browsing the following URLs:
-- Web API: http://localhost:5266/scalar/
+- User management Web API: http://localhost:5266/scalar/
+- Financial Web API: http://localhost:5255/scalar/
 - Web site: http://localhost:4222/
 
 If you wish to run the local env like production one, just execute the following command (only for Web API at the moment):
@@ -111,7 +120,9 @@ Several files are involved on the environment setup. You can see each file respo
 
 `compose.yml` --> To create the containers. There we have the WebAPI, DB, Web site container specifications.
 
-`Dockerfile.UserManagement.api` --> To build and run web api. In the same way, the database is deployed and populated throught data migrations during this process.
+`Dockerfile.UserManagement.api` --> To build and run User Management web api. In the same way, the database is deployed and populated throught data migrations during this process.
+
+`Dockerfile.Financial.api` --> To build and run Financial web api. In the same way, the database is deployed and populated throught data migrations during this process.
 
 `Dockerfile.DigitalWallet.web` --> To build and run web site.
 
@@ -123,8 +134,13 @@ Several files are involved on the environment setup. You can see each file respo
 
 ## API Documentation
 
-You can ask the api contract browsing this URL:
+You can ask the api contracts browsing those URL:
+
+For the User management api:
 http://localhost:5266/openapi/v1.json
+
+For the Financial api:
+http://localhost:5255/openapi/v1.json
 
 
 ---
@@ -152,6 +168,8 @@ To run it we must:
 1) From repository root directory, go to Test project folder:
 
 `cd src/SelfResearch.UserManagement.API.Test/`
+or:
+`cd src/SelfResearch.Financial.API.Test/`
 
 2) Provide execution mode to the bash file:
 
