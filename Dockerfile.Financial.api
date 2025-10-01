@@ -1,0 +1,25 @@
+# build stage
+FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
+WORKDIR /src
+
+ARG BUILD_CONFIGURATION=Debug
+ENV BUILD_CONFIGURATION=$BUILD_CONFIGURATION
+
+# Install the EF Core tools
+RUN dotnet tool install --global dotnet-ef
+ENV PATH="$PATH:/root/.dotnet/tools"
+
+# Copy csproj and restore nuget packages
+COPY src/SelfResearch.Financial.API/SelfResearch.Financial.API.csproj src/SelfResearch.Financial.API/
+WORKDIR /src/src/SelfResearch.Financial.API/
+RUN dotnet restore SelfResearch.Financial.API.csproj
+
+# Copy the code, build and publish
+COPY src/SelfResearch.Financial.API/. .
+RUN dotnet publish SelfResearch.Financial.API.csproj -c $BUILD_CONFIGURATION -o /app/publish
+
+# Copy the published app and run the app.
+FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS final
+WORKDIR /app
+COPY --from=build /app/publish .
+ENTRYPOINT ["dotnet", "SelfResearch.Financial.API.dll"]

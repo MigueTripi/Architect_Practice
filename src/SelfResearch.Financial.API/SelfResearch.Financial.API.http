@@ -1,0 +1,6 @@
+@SelfResearch.Financial.API_HostAddress = http://localhost:5205
+
+GET {{SelfResearch.Financial.API_HostAddress}}/financial/
+Accept: application/json
+
+###
