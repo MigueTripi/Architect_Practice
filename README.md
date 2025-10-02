@@ -1,5 +1,6 @@
 ## Table of Contents
 
+
 - [SelfResearch challenge overview](#selfresearch-challenge-overview)
 - [Requirement understanding](#requirement-understanding)
 - [Proposed solution](#proposed-solution)
@@ -40,6 +41,23 @@ Next steps:
 
 Each microservice will communicate with the other in an event based architecture. Also, the microservices will follow DDD approach, RESTFull standard and handle data persistence between different microservices. 
 The client web site is going to consume both microservices to show the required data and for creating the needed ones. 
+
+### Architecture diagrams
+
+There you can find the system's high level diagrams
+
+```mermaid
+architecture-beta
+    group api(server)[Microservices]
+
+    service financial_api(internet)[Financial Microservice] in api
+    service financial_db(database)[Financial DB] in api
+    service usermanagement_api(internet)[User Management Microservice] in api
+    service usermanagement_db(database)[User management DB] in api
+    
+    financial_api:B--T:financial_db
+    usermanagement_api:B--T:usermanagement_db
+```
 
 
 ### Technologies
