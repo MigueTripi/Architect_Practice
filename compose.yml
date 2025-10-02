@@ -3,19 +3,28 @@ services:
     container_name: UserManagementDB_Container
     image: postgres:17-trixie
     environment:
-      POSTGRES_DB: usermanagement_db
-      POSTGRES_USER: UM_DbUser
-      POSTGRES_PASSWORD: P455w0rd$
+      POSTGRES_USER_DB: usermanagement_db
+      POSTGRES_USERBD_USER: UM_DbUser
+      POSTGRES_FINANCIAL_DB: financial_db
+      POSTGRES_FINANCIALDB_USER: FIN_DbUser
+      POSTGRES_PASSWORD: 5uperUs3rPa$$
     ports:
       - "5432:5432"
     networks:
       - app-network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      test: [
+        "CMD-SHELL", "pg_isready -U ${POSTGRES_USERBD_USER} -d ${POSTGRES_USER_DB}",
+        "CMD-SHELL", "pg_isready -U ${POSTGRES_FINANCIALDB_USER} -d ${POSTGRES_FINANCIAL_DB}"
+        ]
       interval: 5s
       retries: 5
       start_period: 30s
       timeout: 10s
+    volumes:
+      - ./create_user_db.sql:/docker-entrypoint-initdb.d/create_user_db.sql
+      - ./create_financial_db.sql:/docker-entrypoint-initdb.d/create_financial_db.sql
+      
 
   usermanagement-webapi:
     build:
@@ -34,6 +43,24 @@ services:
     networks:
       - app-network
 
+  financial-webapi:
+    build:
+      context: .
+      dockerfile: Dockerfile.Financial.api
+    container_name: FinancialAPI_Container
+    ports:
+      - "5255:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      ConnectionStrings__DefaultConnection: "Host=postgres;Port=5432;Database=financial_db;Username=FIN_DbUser;Password=FiNw0rd$"
+      ASPNETCORE_URLS: "http://+:8080"
+      ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT}
+    networks:
+      - app-network
+
+
   digitalwallet-web:
     build:
       context: .
@@ -43,6 +70,7 @@ services:
       - "4222:4200"
     depends_on:
       - usermanagement-webapi
+      - financial-webapi
     networks:
       - app-network
 
