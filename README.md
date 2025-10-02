@@ -1,5 +1,19 @@
 ## Table of Contents
 
+Here is a simple flow chart:
+
+```mermaid
+graph TD;
+    A-->B;
+    A-->C;
+    B-->D;
+    C-->D;
+```
+
+```mermaid
+  info
+```
+
 - [SelfResearch challenge overview](#selfresearch-challenge-overview)
 - [Requirement understanding](#requirement-understanding)
 - [Proposed solution](#proposed-solution)
