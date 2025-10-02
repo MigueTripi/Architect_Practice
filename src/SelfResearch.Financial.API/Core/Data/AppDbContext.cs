@@ -1,8 +1,10 @@
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 using SelfResearch.Financial.API.Feature.Wallet;
 
 namespace SelfResearch.Financial.API.Core.Data;
 
+[ExcludeFromCodeCoverage]
 public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(options)
 {
     public DbSet<Wallet> Wallets { get; set; }

@@ -1,9 +1,11 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 using SelfResearch.Financial.API.Core.Data;
 
 namespace SelfResearch.Financial.API.Feature.Wallet.RetrieveWallet;
 
+[ExcludeFromCodeCoverage]
 public class RetrieveWalletRepository : IRetrieveWalletRepository
 {
 
