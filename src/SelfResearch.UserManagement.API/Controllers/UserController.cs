@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
+using SelfResearch.UserManagement.API.Features.UserManagement.CreateUser;
 
 namespace SelfResearch.UserManagement.API.Controllers
 {
@@ -13,13 +14,16 @@ namespace SelfResearch.UserManagement.API.Controllers
     {
         private readonly ILogger<UserController> _logger;
         private readonly IUserManagementService _userManagementService;
+        private readonly ICreateUserService _createUserService;
 
         public UserController(
             ILogger<UserController> logger,
-            IUserManagementService userManagementService)
+            IUserManagementService userManagementService,
+            ICreateUserService createUserService)
         {
             _logger = logger;
             _userManagementService = userManagementService;
+            _createUserService = createUserService;
         }
 
         [HttpGet("{id}")]
@@ -65,7 +69,7 @@ namespace SelfResearch.UserManagement.API.Controllers
                 return BadRequest("User ID must be zero for creation.");
             }
 
-            var newUser = await this._userManagementService.CreateUserAsync(user);
+            var newUser = await this._createUserService.CreateUserAsync(user);
             return CreatedAtAction(nameof(GetUserById), new { id = newUser.Id }, newUser);
         }
 

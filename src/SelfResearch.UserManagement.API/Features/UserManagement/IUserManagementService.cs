@@ -20,14 +20,6 @@ public interface IUserManagementService
     /// <returns>The paged users</returns>
     Task<List<UserDto>> GetPagedUsersAsync(int skip, int take);
 
-
-    /// <summary>
-    /// Creates a new user.
-    /// </summary>
-    /// <param name="userDto">The user to create</param>
-    /// <returns>The created user</returns>
-    Task<UserDto> CreateUserAsync(UserDto userDto);
-
     /// <summary>
     /// Deletes a user by its identifier.
     /// </summary>

@@ -33,13 +33,6 @@ public class UserManagementService : IUserManagementService
     }
 
     /// <inheritdoc/>
-    public async Task<UserDto> CreateUserAsync(UserDto userDto)
-    {
-        var user = await this._userManagementRepository.CreateUserAsync(this._mapper.Map<User>(userDto));
-        return this._mapper.Map<UserDto>(user);
-    }
-
-    /// <inheritdoc/>
     public async Task<UserDto?> PatchUserAsync(int id, JsonPatchDocument<UserDto> patchingDocument)
     {
         var dbUser = await this._userManagementRepository.GetUserAsync(id);

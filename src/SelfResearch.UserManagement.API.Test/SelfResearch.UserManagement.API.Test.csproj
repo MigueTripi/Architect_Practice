@@ -32,8 +32,4 @@
     <Folder Include="Features/UserManagement/" />
   </ItemGroup>
 
-  <!-- <PropertyGroup>
-    <ExcludeByFile>**/Migrations/*.cs</ExcludeByFile>
-  </PropertyGroup> -->
-
 </Project>

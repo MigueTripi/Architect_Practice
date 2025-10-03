@@ -3,6 +3,7 @@ using SelfResearch.UserManagement.API.Features.UserManagement;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
+using SelfResearch.UserManagement.API.Features.UserManagement.CreateUser;
 
 namespace SelfResearch.UserManagement.API.Test.Controllers;
 
@@ -10,6 +11,7 @@ public class UserControllerTest
 {
     private Mock<ILogger<UserController>> _loggerMock = new();
     private Mock<IUserManagementService> _userManagementService = new();
+    private Mock<ICreateUserService> _createUserService = new();
     private UserDto _existingTestUser = new UserDto { Id = 1, Name = "Existing User" };
     private UserDto _newTestUser = new UserDto { Id = 0, Name = "New User" };
 
@@ -104,7 +106,7 @@ public class UserControllerTest
     public async Task CreateUser_WithValidRequest_ReturnsCreatedUser()
     {
         // Arrange
-        _userManagementService.Setup(x => x.CreateUserAsync(_newTestUser))
+        _createUserService.Setup(x => x.CreateUserAsync(_newTestUser))
             .ReturnsAsync(_newTestUser);
         var controller = GetNewValidController();
 
@@ -238,7 +240,10 @@ public class UserControllerTest
 
     private UserController GetNewValidController()
     {
-        return new UserController(_loggerMock.Object, _userManagementService.Object);
+        return new UserController(
+            _loggerMock.Object,
+            _userManagementService.Object,
+            _createUserService.Object);
     }
 
 }
