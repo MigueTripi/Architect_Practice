@@ -12,6 +12,7 @@ public class UserControllerTest
     private Mock<ILogger<UserController>> _loggerMock = new();
     private Mock<IUserManagementService> _userManagementService = new();
     private Mock<ICreateUserService> _createUserService = new();
+    private Mock<IUpdateUserService> _updateUserService = new();
     private UserDto _existingTestUser = new UserDto { Id = 1, Name = "Existing User" };
     private UserDto _newTestUser = new UserDto { Id = 0, Name = "New User" };
 
@@ -212,7 +213,7 @@ public class UserControllerTest
     public async Task UpdateStateAsync_WithInexistingUser_ReturnsNotFound()
     {
         // Arrange
-        _userManagementService.Setup(x => x.UpdateUserStateAsync(It.IsAny<int>(), It.IsAny<UserStateEnumDto>()))
+        _updateUserService.Setup(x => x.UpdateUserStateAsync(It.IsAny<int>(), It.IsAny<UserStateEnumDto>()))
             .ReturnsAsync((UserDto?)null);
         var controller = GetNewValidController();
 
@@ -227,7 +228,7 @@ public class UserControllerTest
     public async Task UpdateStateAsync_WithExistingUser_ReturnsOk()
     {
         // Arrange
-        _userManagementService.Setup(x => x.UpdateUserStateAsync(It.IsAny<int>(), It.IsAny<UserStateEnumDto>()))
+        _updateUserService.Setup(x => x.UpdateUserStateAsync(It.IsAny<int>(), It.IsAny<UserStateEnumDto>()))
             .ReturnsAsync(new UserDto());
         var controller = GetNewValidController();
 
@@ -243,7 +244,8 @@ public class UserControllerTest
         return new UserController(
             _loggerMock.Object,
             _userManagementService.Object,
-            _createUserService.Object);
+            _createUserService.Object,
+            _updateUserService.Object);
     }
 
 }

@@ -15,15 +15,18 @@ namespace SelfResearch.UserManagement.API.Controllers
         private readonly ILogger<UserController> _logger;
         private readonly IUserManagementService _userManagementService;
         private readonly ICreateUserService _createUserService;
+        private readonly IUpdateUserService _updateUserService;
 
         public UserController(
             ILogger<UserController> logger,
             IUserManagementService userManagementService,
-            ICreateUserService createUserService)
+            ICreateUserService createUserService,
+            IUpdateUserService updateUserService)
         {
             _logger = logger;
             _userManagementService = userManagementService;
             _createUserService = createUserService;
+            _updateUserService = updateUserService;
         }
 
         [HttpGet("{id}")]
@@ -119,7 +122,7 @@ namespace SelfResearch.UserManagement.API.Controllers
                 return BadRequest("State update data is required.");
             }
 
-            var updatedUser = await this._userManagementService.UpdateUserStateAsync(id, stateUpdate.UserState);
+            var updatedUser = await this._updateUserService.UpdateUserStateAsync(id, stateUpdate.UserState);
             if (updatedUser == null)
             {
                 return NotFound("User not found.");

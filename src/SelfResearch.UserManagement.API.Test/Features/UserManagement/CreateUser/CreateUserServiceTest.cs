@@ -9,20 +9,46 @@ public class CreateUserServiceTest
 {
     private Mock<IUserManagementRepository> _userManagementRepositoryMock = new();
     private Mock<IMapper> _mapperMock = new();
+    private Mock<IMessageSession> _messageSesionMock = new();
 
     [Fact]
-    public async Task CreateUserAsync_ReturnsCreatedUser()
+    public async Task CreateUserAsync_WithCorrectDto_ReturnsCreatedUserWithStateInitial()
     {
         // Arrange
-        var userDto = new UserDto { Name = "New User", Email = "test@test.com", State = UserStateEnumDto.Active };
-        var user = new User { Id = 1, Name = userDto.Name, Email = userDto.Email, State = UserStateEnum.Active };
+        UserDto userDto = new UserDto()
+        {
+            Id = 0,
+            Name = "Test User dto",
+            Email = "mail@dto.com",
+            State = UserStateEnumDto.Active
+        };
 
         _mapperMock.Setup(x => x.Map<User>(It.IsAny<UserDto>()))
-            .Returns(user);
+            .Returns((UserDto userDto) =>
+            {
+                return new User
+                {
+                    Id = userDto.Id,
+                    Name = userDto.Name,
+                    Email = userDto.Email,
+                    State = (UserStateEnum)userDto.State
+                };
+            });
+
         _mapperMock.Setup(x => x.Map<UserDto>(It.IsAny<User>()))
-            .Returns(userDto);
+            .Returns((User anUser) =>
+            {
+                return new UserDto
+                {
+                    Id = anUser.Id,
+                    Name = anUser.Name,
+                    Email = anUser.Email,
+                    State = (UserStateEnumDto)anUser.State
+                };
+            });
+
         _userManagementRepositoryMock.Setup(x => x.CreateUserAsync(It.IsAny<User>()))
-            .ReturnsAsync(user);
+            .ReturnsAsync((User anUser) => { return anUser; });
 
         var service = GetNewValidService();
 
@@ -32,19 +58,14 @@ public class CreateUserServiceTest
         // Assert
         Assert.Equal(userDto.Name, result.Name);
         Assert.Equal(userDto.Email, result.Email);
-        Assert.Equal((int)userDto.State, (int)result.State);
+        Assert.Equal((int)UserStateEnumDto.Initial, (int)result.State);
     }
 
     private CreateUserService GetNewValidService()
     {
-        return new CreateUserService(_userManagementRepositoryMock.Object, this._mapperMock.Object);
-    }
-    
-    private void AssertUserData(UserDto dto, User user)
-    {
-        Assert.Equal(dto.Id, user.Id);
-        Assert.Equal(dto.Name, user.Name);
-        Assert.Equal(dto.Email, user.Email);
-        Assert.Equal((int)dto.State, (int)user.State);
+        return new CreateUserService(
+            _userManagementRepositoryMock.Object,
+            _mapperMock.Object,
+            _messageSesionMock.Object);
     }
 }
