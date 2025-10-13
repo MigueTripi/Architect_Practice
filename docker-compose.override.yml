@@ -1,0 +1,4 @@
+services:
+  usermanagement-webapi:
+    env_file:
+      - ./src/SelfResearch.UserManagement.API/.env

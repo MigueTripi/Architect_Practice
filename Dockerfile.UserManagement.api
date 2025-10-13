@@ -9,8 +9,14 @@ ENV BUILD_CONFIGURATION=$BUILD_CONFIGURATION
 RUN dotnet tool install --global dotnet-ef
 ENV PATH="$PATH:/root/.dotnet/tools"
 
-# Copy csproj and restore nuget packages
+# Copy csproj and restore nuget packages for required projects
 COPY src/SelfResearch.UserManagement.API/SelfResearch.UserManagement.API.csproj src/SelfResearch.UserManagement.API/
+COPY src/SelfResearch.UserManagement.API.Contracts/SelfResearch.UserManagement.API.Contracts.csproj src/SelfResearch.UserManagement.API.Contracts/
+
+WORKDIR /src/src/SelfResearch.UserManagement.API.Contracts/
+RUN dotnet restore SelfResearch.UserManagement.API.Contracts.csproj
+COPY src/SelfResearch.UserManagement.API.Contracts/. .
+
 WORKDIR /src/src/SelfResearch.UserManagement.API/
 RUN dotnet restore SelfResearch.UserManagement.API.csproj
 

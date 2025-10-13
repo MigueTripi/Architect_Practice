@@ -33,13 +33,6 @@ public class UserManagementService : IUserManagementService
     }
 
     /// <inheritdoc/>
-    public async Task<UserDto> CreateUserAsync(UserDto userDto)
-    {
-        var user = await this._userManagementRepository.CreateUserAsync(this._mapper.Map<User>(userDto));
-        return this._mapper.Map<UserDto>(user);
-    }
-
-    /// <inheritdoc/>
     public async Task<UserDto?> PatchUserAsync(int id, JsonPatchDocument<UserDto> patchingDocument)
     {
         var dbUser = await this._userManagementRepository.GetUserAsync(id);
@@ -68,24 +61,5 @@ public class UserManagementService : IUserManagementService
 
         await this._userManagementRepository.DeleteUserAsync(id);
         return true;
-    }
-
-    /// <inheritdoc/>
-    public async Task<UserDto?> UpdateUserStateAsync(int id, UserStateEnumDto newState)
-    {
-        var dbUser = await this._userManagementRepository.GetUserAsync(id);
-        if (dbUser == null)
-        {
-            return null;
-        }
-
-        //TODO: Add validation of state transitions
-
-        dbUser.State = (UserStateEnum)newState;
-        await this._userManagementRepository.UpdateUserAsync();
-
-        //TODO: Publish service bus event
-
-        return this._mapper.Map<UserDto>(dbUser);
     }
 }

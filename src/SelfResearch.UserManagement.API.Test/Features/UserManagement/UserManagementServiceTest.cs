@@ -84,31 +84,6 @@ public class UserManagementServiceTest
     }
 
     [Fact]
-    public async Task CreateUserAsync_ReturnsCreatedUser()
-    {
-        // Arrange
-        var userDto = new UserDto { Name = "New User", Email = "test@test.com", State = UserStateEnumDto.Active };
-        var user = new User { Id = 1, Name = userDto.Name, Email = userDto.Email, State = UserStateEnum.Active };
-
-        _mapperMock.Setup(x => x.Map<User>(It.IsAny<UserDto>()))
-            .Returns(user);
-        _mapperMock.Setup(x => x.Map<UserDto>(It.IsAny<User>()))
-            .Returns(userDto);
-        _userManagementRepositoryMock.Setup(x => x.CreateUserAsync(It.IsAny<User>()))
-            .ReturnsAsync(user);
-
-        var service = GetNewValidService();
-
-        // Act
-        var result = await service.CreateUserAsync(userDto);
-
-        // Assert
-        Assert.Equal(userDto.Name, result.Name);
-        Assert.Equal(userDto.Email, result.Email);
-        Assert.Equal((int)userDto.State, (int)result.State);
-    }
-
-    [Fact]
     public async Task PatchUserAsync_WithNonExistentUser_ReturnsNull()
     {
         // Arrange
@@ -228,50 +203,6 @@ public class UserManagementServiceTest
         // Assert
         Assert.True(result);
         _userManagementRepositoryMock.Verify(x => x.DeleteUserAsync(1), Times.Once);
-    }
-
-    [Fact]
-    public async Task UpdateStateAsync_WithNonExistentUser_ReturnsNull()
-    {
-        // Arrange
-        _userManagementRepositoryMock.Setup(x => x.GetUserAsync(It.IsAny<int>()))
-            .ReturnsAsync((User?)null);
-
-        var service = GetNewValidService();
-
-        // Act
-        var result = await service.UpdateUserStateAsync(1, UserStateEnumDto.Active);
-
-        // Assert
-        Assert.Null(result);
-    }
-
-    [Fact]
-    public async Task UpdateStateAsync_WithExistentUser_ReturnsUser()
-    {
-        // Arrange
-        var user = new User { Id = 1, Name = "Test User", Email = "m@m.com", State = UserStateEnum.Active };
-        _userManagementRepositoryMock.Setup(x => x.GetUserAsync(It.IsAny<int>()))
-            .ReturnsAsync(user);
-        _userManagementRepositoryMock.Setup(x => x.UpdateUserAsync())
-            .Returns(Task.CompletedTask);
-        _mapperMock.Setup(x => x.Map<UserDto>(It.IsAny<User>()))
-            .Returns((User source) => new UserDto
-            {
-                Id = source.Id,
-                Name = source.Name,
-                Email = source.Email,
-                State = (UserStateEnumDto)source.State
-            });
-
-        var service = GetNewValidService();
-
-        // Act
-        var result = await service.UpdateUserStateAsync(1, UserStateEnumDto.Inactive);
-
-        // Assert
-        Assert.NotNull(result);
-        _userManagementRepositoryMock.Verify(x => x.UpdateUserAsync(), Times.Once);
     }
 
     private UserManagementService GetNewValidService()

@@ -72,12 +72,49 @@ The following is the tech slack for solving the challenge
 | Postgres  | 17.trixie|
 | EF        | 9.0.9   |
 
+### Microservices overview
+
+#### User management
+
+This microservice will be incharged of handling user related data such as state, profile and personal information.
+
+
+#### Financial
+
+This microservice will take care about the financial transactions and the user balances.
+
+#### Microservice interaction
+
+The microservices will communicate between them using an event driven architecture supported by Azure Service Bus messaging queue provider.
+
+##### List of topics
+
+| Message   | Microservice | Meaning |
+| --        | --           | --      |
+| selfresearch.usermanagement.api.contracts.usercreationsucceedmessage | UserManagement | A new User was created in the system |
+
+##### Data consistency strategy
+
+To ensure data consistency across the services, the saga pattern is implemented using Orchestration-based of choreography-based approachs dependeing on the needs.
+
+There you have some useful documentation from [Chris Richardson](https://github.com/cer) about the topics:
+
+Elemental -> https://microservices.io/patterns/data/saga.html
+Extended explanation -> https://livebook.manning.com/book/microservices-patterns/chapter-4#62
+
 
 ## Run and test application
 
 ### Web APIs
 
 For debugging API you could use Scalar adapter to test each functionality. Run manually `SelfResearch.UserManagement.API` project and browse this URL http://localhost:5262/scalar/.
+**Note:** You will need to create some secrets to run the application locally. You will need to have the following keys:
+
+``` text
+ConnectionStrings__DefaultConnection -> The user management db connection string
+Azure__ServiceBus__ServiceBusConnectionString -> The serviceBus connection string
+Azure__ServiceBus__NServiceBusEndpointName -> The NserviceBus endpoint name
+```
 
 Note: You also could run the application after deploying it on Docker. See the following section for further details.
 
@@ -103,11 +140,22 @@ Note 2: You also could run the application after deploying it on Docker. See the
 
 To run the application locally you might choose to mount Docker containers. At the moment, we have four different containers:
 - Postgres -> Hosting DBs.
-- WebApi -> Hosting the web api.
-- Web -> Hosting the Angular Web.
+- UserManagementAPI_Container -> Hosting the user management web api.
+- FinancialAPI_Container -> Hosting Financial web api.
+- DigitalWalletWeb_Container -> Hosting the Angular Web.
 - nginx -> TBD
 
-There is a bash script which creates and run the containers. Mentioned script has the capability to build and deploy on Debug/Release and Development/Production configurations. 
+There is a bash script which creates and run the containers. Mentioned script has the capability to build and deploy on Debug/Release and Development/Production configurations. Also, this script needs a .env file to be placed ath project root level in order to solve the environment variables for the keys. 
+i.e: For UserManagement web api you must have a `.env` file in the same directory as `Selfresearch.UserManagement.API.csproj` with the following keys:
+
+```bash
+
+ConnectionStrings__DefaultConnection='Host=yourhost;Port=5432;Database=dbName;UserName=theUser;password=thePassword'
+Azure__ServiceBus__ServiceBusConnectionString='Endpoint=sb://theEndPoint/;SharedAccessKeyName=TheSharedAccessKeyName;SharedAccessKey=TheKey'
+Azure__ServiceBus__NServiceBusEndpointName='NServiceBusEndpointName'
+
+```
+
 
 **Note** that the default configuration is Debug/Development.
 

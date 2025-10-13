@@ -20,14 +20,6 @@ public interface IUserManagementService
     /// <returns>The paged users</returns>
     Task<List<UserDto>> GetPagedUsersAsync(int skip, int take);
 
-
-    /// <summary>
-    /// Creates a new user.
-    /// </summary>
-    /// <param name="userDto">The user to create</param>
-    /// <returns>The created user</returns>
-    Task<UserDto> CreateUserAsync(UserDto userDto);
-
     /// <summary>
     /// Deletes a user by its identifier.
     /// </summary>
@@ -42,12 +34,4 @@ public interface IUserManagementService
     /// <param name="patchingDocument">The patching document</param>
     /// <returns>The updated user</returns>
     Task<UserDto?> PatchUserAsync(int id, JsonPatchDocument<UserDto> patchingDocument);
-
-    /// <summary>
-    /// Updates the state of a user.
-    /// </summary>
-    /// <param name="id">The user identifier</param>
-    /// <param name="newState">The newState</param>
-    /// <returns>The updated user</returns>
-    Task<UserDto?> UpdateUserStateAsync(int id, UserStateEnumDto newState);
 }
