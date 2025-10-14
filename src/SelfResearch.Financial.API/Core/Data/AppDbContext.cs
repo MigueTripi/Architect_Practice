@@ -1,5 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
+using SelfResearch.Financial.API.Feature.Propagate;
 using SelfResearch.Financial.API.Feature.Wallet;
 
 namespace SelfResearch.Financial.API.Core.Data;
@@ -8,6 +9,7 @@ namespace SelfResearch.Financial.API.Core.Data;
 public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(options)
 {
     public DbSet<Wallet> Wallets { get; set; }
+    public DbSet<PropagatedUser> Users { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -43,6 +45,19 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
 
             entity.Property(e => e.UpdatedAt)
                 .HasColumnName("updated_at");
+        });
+
+        modelBuilder.Entity<PropagatedUser>(entity =>
+        {
+            entity.ToTable("prp_users");
+
+            entity.HasKey(e => e.Id)
+                .HasName("pk_users");
+            entity.Property(e => e.Id).ValueGeneratedNever();
+
+            entity.Property(e => e.State)
+                .HasColumnName("state")
+                .IsRequired();
         });
 
         base.OnModelCreating(modelBuilder);

@@ -71,6 +71,7 @@ The following is the tech slack for solving the challenge
 | Angular   | 19      |
 | Postgres  | 17.trixie|
 | EF        | 9.0.9   |
+|Azure Service Bus |  |
 
 ### Microservices overview
 
@@ -89,9 +90,9 @@ The microservices will communicate between them using an event driven architectu
 
 ##### List of topics
 
-| Message   | Microservice | Meaning |
-| --        | --           | --      |
-| selfresearch.usermanagement.api.contracts.usercreationsucceedmessage | UserManagement | A new User was created in the system |
+| Message   | Microservice | Meaning | Listeners
+| --        | --           | --      | -- |
+| selfresearch.usermanagement.api.contracts.usercreationsucceedmessage | UserManagement | A new User was created in the system | Financial Service|
 
 ##### Data consistency strategy
 
@@ -145,7 +146,7 @@ To run the application locally you might choose to mount Docker containers. At t
 - DigitalWalletWeb_Container -> Hosting the Angular Web.
 - nginx -> TBD
 
-There is a bash script which creates and run the containers. Mentioned script has the capability to build and deploy on Debug/Release and Development/Production configurations. Also, this script needs a .env file to be placed ath project root level in order to solve the environment variables for the keys. 
+There is a bash script which creates and run the containers. Mentioned script has the capability to build and deploy on Debug/Release and Development/Production configurations. Also, this script needs a .env file to be placed at project directory level in order to solve the environment variables for the keys. 
 i.e: For UserManagement web api you must have a `.env` file in the same directory as `Selfresearch.UserManagement.API.csproj` with the following keys:
 
 ```bash
@@ -155,7 +156,7 @@ Azure__ServiceBus__ServiceBusConnectionString='Endpoint=sb://theEndPoint/;Shared
 Azure__ServiceBus__NServiceBusEndpointName='NServiceBusEndpointName'
 
 ```
-
+The same must applied to Financial web api.
 
 **Note** that the default configuration is Debug/Development.
 
@@ -184,7 +185,9 @@ Take into consideration that Scalar is not available for production configuratio
 
 Several files are involved on the environment setup. You can see each file responsability below:
 
-`compose.yml` --> To create the containers. There we have the WebAPI, DB, Web site container specifications.
+`docker-compose.yml` --> To create the containers. There we have the WebAPI, DB, Web site container specifications.
+
+`docker-compose.override.yml` --> To inject some configurations such as environment variables.
 
 `Dockerfile.UserManagement.api` --> To build and run User Management web api. In the same way, the database is deployed and populated throught data migrations during this process.
 

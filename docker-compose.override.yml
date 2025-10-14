@@ -2,3 +2,6 @@ services:
   usermanagement-webapi:
     env_file:
       - ./src/SelfResearch.UserManagement.API/.env
+  financial-webapi:
+    env_file:
+      - ./src/SelfResearch.Financial.API/.env

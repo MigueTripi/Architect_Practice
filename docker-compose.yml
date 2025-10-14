@@ -53,7 +53,6 @@ services:
       postgres:
         condition: service_healthy
     environment:
-      ConnectionStrings__DefaultConnection: "Host=postgres;Port=5432;Database=financial_db;Username=FIN_DbUser;Password=FiNw0rd$"
       ASPNETCORE_URLS: "http://+:8080"
       ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT}
     networks:
