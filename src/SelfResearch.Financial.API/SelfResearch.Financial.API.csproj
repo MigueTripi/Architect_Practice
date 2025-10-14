@@ -1,9 +1,10 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>67ed3857-7ad5-4534-b32f-f4ae54c766bd</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
@@ -16,12 +17,25 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
+    <PackageReference Include="Microsoft.Extensions.Azure" Version="1.13.0" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.4" />
     <PackageReference Include="Scalar.AspNetCore" Version="2.8.8" />
+    <PackageReference Include="NServiceBus" Version="9.2.7" />    
+    <PackageReference Include="NServiceBus.Extensions.Hosting" Version="3.0.1" />
+    <PackageReference Include="NServiceBus.Transport.AzureServiceBus" Version="5.1.0" />
   </ItemGroup>
 
   <ItemGroup>
     <Folder Include="Feature/Wallet/BalanceChange/" />
+  </ItemGroup>
+  <ItemGroup>
+    <ExcludeFromCodeCoverage Include="**/Migrations/*" />
+    <ExcludeFromCodeCoverage Include="Program.cs" />
+  </ItemGroup>
+
+<!-- TODO: This reference should be a package reference instead. -->
+  <ItemGroup>
+    <ProjectReference Include="../SelfResearch.UserManagement.API.Contracts/SelfResearch.UserManagement.API.Contracts.csproj" />
   </ItemGroup>
 
 </Project>
