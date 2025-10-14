@@ -13,15 +13,15 @@ public class RetrieveWalletServiceTests : BaseTests
     public async Task GetWalletByUserAsync_DontFindWallet_ReturnsNull()
     {
         //Arrange
-        _retrieveWalletRepositoryMock.Setup(x => x.GetWalletByUserIdAsync(It.IsAny<int>()))
-            .ReturnsAsync((Feature.Wallet.Wallet?)null);
+        _retrieveWalletRepositoryMock.Setup(x => x.GetWalletsByUserIdAsync(It.IsAny<int>()))
+            .ReturnsAsync([]);
         var service = GetNewValidService();
 
         //Act
-        var result = await service.GetWalletByUserAsync(1);
+        var result = await service.GetWalletsByUserAsync(1);
 
         //Assert
-        Assert.Null(result);
+        Assert.Empty(result);
     }
 
     [Fact]
@@ -29,16 +29,17 @@ public class RetrieveWalletServiceTests : BaseTests
     {
         //Arrange
         var expectedWallet = GetDummyWallet();
-        _retrieveWalletRepositoryMock.Setup(x => x.GetWalletByUserIdAsync(It.IsAny<int>()))
-            .ReturnsAsync(expectedWallet);
+        _retrieveWalletRepositoryMock.Setup(x => x.GetWalletsByUserIdAsync(It.IsAny<int>()))
+            .ReturnsAsync([expectedWallet]);
         var service = GetNewValidService();
 
         //Act
-        var result = await service.GetWalletByUserAsync(1);
+        var result = await service.GetWalletsByUserAsync(1);
 
         //Assert
         Assert.NotNull(result);
-        AssertWalletEntity(expectedWallet, result);
+        Assert.Single(result);
+        AssertWalletEntity(expectedWallet, result.First());
     }
 
     private void AssertWalletEntity(Feature.Wallet.Wallet expected, WalletDto result)

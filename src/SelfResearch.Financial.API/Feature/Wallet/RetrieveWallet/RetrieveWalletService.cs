@@ -20,9 +20,9 @@ public class RetrieveWalletService : IRetrieveWalletService
     }
 
     // <inheritdoc />
-    public async Task<WalletDto?> GetWalletByUserAsync(int userId)
+    public async  Task<List<WalletDto>> GetWalletsByUserAsync(int userId)
     {
-        var wallet = await _retrieveWalletRepository.GetWalletByUserIdAsync(userId);
-        return _mapper.Map<WalletDto?>(wallet);
+        var wallets = await _retrieveWalletRepository.GetWalletsByUserIdAsync(userId);
+        return _mapper.Map<List<WalletDto>>(wallets);
     }    
 }

@@ -3,6 +3,8 @@ using Moq;
 using NServiceBus.Testing;
 using SelfResearch.Financial.API.Core.EventHandlers;
 using SelfResearch.Financial.API.Feature.Propagate;
+using SelfResearch.Financial.API.Feature.Wallet;
+using SelfResearch.Financial.API.Feature.Wallet.CreateWalet;
 using SelfResearch.UserManagement.API.Contracts;
 
 namespace SelfResearch.Financial.API.Test.Core.EventHandlers;
@@ -10,6 +12,7 @@ namespace SelfResearch.Financial.API.Test.Core.EventHandlers;
 public class CreateUserEventHandlerTests
 {
     private Mock<IPropagatedEntityService<PropagatedUser>> _propagateUserServiceMock = new();
+    private Mock<ICreateWalletService> _createWalletServiceMock = new();
 
     [Fact]
     public async Task Handle_NewUser_CreatesUser()
@@ -29,6 +32,8 @@ public class CreateUserEventHandlerTests
                 Id = message.UserId,
                 State = message.State
             });
+        _createWalletServiceMock.Setup(x => x.CreateDefaultWalletForUserAsync(It.IsAny<int>()))
+            .ReturnsAsync(new WalletDto());
 
         // Act
         await handler.Handle(message, new TestableMessageHandlerContext());
@@ -36,6 +41,7 @@ public class CreateUserEventHandlerTests
         // Assert
         _propagateUserServiceMock.Verify(x => x.GetByIdAsync(message.UserId), Times.Once);
         _propagateUserServiceMock.Verify(x => x.CreateAsync(It.IsAny<PropagatedUser>()), Times.Once);
+        _createWalletServiceMock.Verify(x => x.CreateDefaultWalletForUserAsync(It.IsAny<int>()), Times.Once);
     }
 
     [Fact]
@@ -68,7 +74,6 @@ public class CreateUserEventHandlerTests
 
     private CreateUserEventHandler GetValidHandler()
     {
-        return new CreateUserEventHandler(_propagateUserServiceMock.Object);
+        return new CreateUserEventHandler(_propagateUserServiceMock.Object, _createWalletServiceMock.Object);
     }
-
 }
