@@ -1,5 +1,6 @@
 using System;
 using AutoMapper;
+using SelfResearch.Financial.API.Contracts;
 
 namespace SelfResearch.Financial.API.Feature.Wallet.CreateWalet;
 
@@ -8,15 +9,19 @@ public class CreateWalletService : ICreateWalletService
     private readonly ICreateWalletRepository _repository;
     private readonly IRetrieveWalletService _retrieveWalletService;
     private readonly IMapper _mapper;
+    private readonly IMessageSession _messageSession;
+
 
     public CreateWalletService(
         ICreateWalletRepository repository,
         IRetrieveWalletService retrieveWalletService,
-        IMapper mapper)
+        IMapper mapper,
+        IMessageSession messageSession)
     {
         _repository = repository;
         _mapper = mapper;
         _retrieveWalletService = retrieveWalletService;
+        _messageSession = messageSession;
     }
 
     // <inheritdoc />
@@ -36,7 +41,13 @@ public class CreateWalletService : ICreateWalletService
 
         var wallet = await _repository.CreateAsync(GetDefaultWallet(userId));
 
-       return _mapper.Map<WalletDto>(wallet);    
+        await _messageSession.Publish(new WalletCreationSucceedMessage
+        {
+            UserId = userId,
+            WalletId = wallet.Id
+        });     
+
+        return _mapper.Map<WalletDto>(wallet);    
     }
 
     private Wallet GetDefaultWallet(int userId)

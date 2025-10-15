@@ -93,6 +93,7 @@ The microservices will communicate between them using an event driven architectu
 | Message   | Microservice | Meaning | Listeners
 | --        | --           | --      | -- |
 | selfresearch.usermanagement.api.contracts.usercreationsucceedmessage | UserManagement | A new User was created in the system | Financial Service|
+| selfresearch.financial.api.contracts.walletcreationsucceedmessage | Financial | A new wallet was created | UserManagement | 
 
 ##### Data consistency strategy
 

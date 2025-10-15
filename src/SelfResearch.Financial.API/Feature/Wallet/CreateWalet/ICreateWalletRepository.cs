@@ -9,5 +9,5 @@ public interface ICreateWalletRepository
     /// </summary>
     /// <param name="wallet">The wallet</param>
     /// <returns>The created wallet</returns>
-    Task<Wallet?> CreateAsync(Wallet wallet);
+    Task<Wallet> CreateAsync(Wallet wallet);
 }

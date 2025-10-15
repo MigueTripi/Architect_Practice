@@ -13,7 +13,7 @@ public class CreateWalletRepository : ICreateWalletRepository
         _context = context;
     }
 
-    public async Task<Wallet?> CreateAsync(Wallet wallet)
+    public async Task<Wallet> CreateAsync(Wallet wallet)
     {
         await _context.Wallets.AddAsync(wallet);
         await _context.SaveChangesAsync();
