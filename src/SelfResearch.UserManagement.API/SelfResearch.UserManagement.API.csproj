@@ -26,6 +26,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <!-- TODO: This should be a nuget package -->
+    <ProjectReference Include="../SelfResearch.Financial.API.Contracts/SelfResearch.Financial.API.Contracts.csproj" />
+    
     <ProjectReference Include="../SelfResearch.UserManagement.API.Contracts/SelfResearch.UserManagement.API.Contracts.csproj" />
   </ItemGroup>
 

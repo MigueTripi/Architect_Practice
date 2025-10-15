@@ -21,8 +21,8 @@ public class RetrieveWalletRepository : IRetrieveWalletRepository
     }
 
     // <inheritdoc />
-    public async Task<Wallet?> GetWalletByUserIdAsync(int userId)
+    public async Task<List<Wallet>> GetWalletsByUserIdAsync(int userId)
     {
-        return await _dbContext.Wallets.FirstOrDefaultAsync(w => w.UserId == userId);
+        return await _dbContext.Wallets.Where(w => w.UserId == userId).ToListAsync();
     }
 }

@@ -12,10 +12,16 @@ ENV PATH="$PATH:/root/.dotnet/tools"
 # Copy csproj and restore nuget packages
 COPY src/SelfResearch.Financial.API/SelfResearch.Financial.API.csproj src/SelfResearch.Financial.API/
 COPY src/SelfResearch.UserManagement.API.Contracts/SelfResearch.UserManagement.API.Contracts.csproj src/SelfResearch.UserManagement.API.Contracts/
+COPY src/SelfResearch.Financial.API.Contracts/SelfResearch.Financial.API.Contracts.csproj src/SelfResearch.Financial.API.Contracts/
 
+# This should be a nuget package
 WORKDIR /src/src/SelfResearch.UserManagement.API.Contracts/
 RUN dotnet restore SelfResearch.UserManagement.API.Contracts.csproj
 COPY src/SelfResearch.UserManagement.API.Contracts/. .
+
+WORKDIR /src/src/SelfResearch.Financial.API.Contracts/
+RUN dotnet restore SelfResearch.Financial.API.Contracts.csproj
+COPY src/SelfResearch.Financial.API.Contracts/. .
 
 WORKDIR /src/src/SelfResearch.Financial.API/
 RUN dotnet restore SelfResearch.Financial.API.csproj

@@ -6,6 +6,7 @@ using SelfResearch.Financial.API.Feature.Wallet;
 using SelfResearch.Financial.API.Feature.Wallet.RetrieveWallet;
 using Microsoft.Extensions.Azure;
 using SelfResearch.Financial.API.Feature.Propagate;
+using SelfResearch.Financial.API.Feature.Wallet.CreateWalet;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -52,11 +53,12 @@ builder.Services.AddAutoMapper(cfg =>
     cfg.AddProfile<WalletMappingProfiles>();
 });
 
-
 builder.Services.AddScoped<IRetrieveWalletService, RetrieveWalletService>();
 builder.Services.AddScoped<IRetrieveWalletRepository, RetrieveWalletRepository>();
 builder.Services.AddScoped<IPropagatedEntityService<PropagatedUser>, PropagatedUserService>();
 builder.Services.AddScoped<IPropagatedEntityRepository<PropagatedUser>, PropagatedUserRepository>();
+builder.Services.AddScoped<ICreateWalletService, CreateWalletService>();
+builder.Services.AddScoped<ICreateWalletRepository, CreateWalletRepository>();
 
 var azureServiceBusConnectionString = builder.Configuration.GetSection("Azure:ServiceBus:ServiceBusConnectionString").Value ?? throw new InvalidOperationException("ServiceBusConnectionString is not configured.");
 

@@ -33,8 +33,9 @@
     <ExcludeFromCodeCoverage Include="Program.cs" />
   </ItemGroup>
 
-<!-- TODO: This reference should be a package reference instead. -->
   <ItemGroup>
+    <ProjectReference Include="../SelfResearch.Financial.API.Contracts/SelfResearch.Financial.API.Contracts.csproj" />
+    <!-- TODO: This reference should be a package reference instead. -->
     <ProjectReference Include="../SelfResearch.UserManagement.API.Contracts/SelfResearch.UserManagement.API.Contracts.csproj" />
   </ItemGroup>
 

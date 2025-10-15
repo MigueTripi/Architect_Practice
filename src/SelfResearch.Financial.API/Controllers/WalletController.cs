@@ -23,24 +23,18 @@ namespace SelfResearch.Financial.API.Controllers
         /// </summary>
         /// <param name="userId">The user identifier</param>
         /// <returns>The wallet</returns>
-        [HttpGet("get_by_user/{userId}")]
+        [HttpGet("get_list_by_user/{userId}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<WalletDto>>  GetWalletByUserId(int userId)
+        public async Task<ActionResult<List<WalletDto>>>  GetWalletsByUserId(int userId)
         {
             if (userId <= 0)
             {
                 return BadRequest("Invalid user ID.");
             }
 
-            var result = await _retrieveWalletService.GetWalletByUserAsync(userId);
-            if (result == null)
-            {
-                // _logger.LogWarning($"Wallet not found for user ID: {userId}");
-                return NotFound("Wallet not found.");
-            }
-
+            var result = await _retrieveWalletService.GetWalletsByUserAsync(userId);
             return Ok(result);
         }
     }

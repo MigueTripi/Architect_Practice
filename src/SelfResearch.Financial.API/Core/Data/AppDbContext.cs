@@ -25,6 +25,12 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
                 .HasColumnName("user_id")
                 .IsRequired();
 
+            entity.HasOne<PropagatedUser>()
+                .WithMany()
+                .HasForeignKey(e => e.UserId)
+                .HasConstraintName("fk_wallets_prp_users_user_id")
+                .OnDelete(DeleteBehavior.NoAction);
+
             entity.Property(e => e.Balance)
                 .HasColumnType("decimal(18,2)")
                 .HasColumnName("balance")

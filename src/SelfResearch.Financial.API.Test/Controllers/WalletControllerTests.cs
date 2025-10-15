@@ -17,39 +17,25 @@ public class WalletControllerTests
     [Theory]
     [InlineData(0)]
     [InlineData(-1)]
-    public async Task GetWalletByUserId_WithInvalidId_Returns400BadRequest(int userId)
+    public async Task GetWalletsByUserId_WithInvalidId_Returns400BadRequest(int userId)
     {
         //Arrange and Act
         var controller = GetNewValidController();
-        var result = await controller.GetWalletByUserId(userId);
+        var result = await controller.GetWalletsByUserId(userId);
 
         //Arrange
         Assert.IsType<BadRequestObjectResult>(result.Result);
     }
 
     [Fact]
-    public async Task GetWalletByUserId_ForNonExistingWallet_Returns404NotFound()
+    public async Task GetWalletsByUserId_ForExistingWallet_ReturnsOk()
     {
         //Arrange
-        _retrieveWalletServiceMock.Setup(x => x.GetWalletByUserAsync(It.IsAny<int>())).ReturnsAsync((WalletDto?)null);
+        _retrieveWalletServiceMock.Setup(x => x.GetWalletsByUserAsync(It.IsAny<int>())).ReturnsAsync([new WalletDto()]);
         var controller = GetNewValidController();
 
         //Act
-        var result = await controller.GetWalletByUserId(1);
-
-        //Arrange
-        Assert.IsType<NotFoundObjectResult>(result.Result);
-    }
-
-    [Fact]
-    public async Task GetWalletByUserId_ForExistingWallet_ReturnsOk()
-    {
-        //Arrange
-        _retrieveWalletServiceMock.Setup(x => x.GetWalletByUserAsync(It.IsAny<int>())).ReturnsAsync(new WalletDto());
-        var controller = GetNewValidController();
-
-        //Act
-        var result = await controller.GetWalletByUserId(1);
+        var result = await controller.GetWalletsByUserId(1);
 
         //Arrange
         Assert.IsType<OkObjectResult>(result.Result);
