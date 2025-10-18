@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using SelfResearch.UserManagement.API.Features.UserManagement;
 using Moq;
+using SelfResearch.Core.Infraestructure.ErrorHandling;
 
 namespace SelfResearch.UserManagement.API.Test.Features.UserManagement;
 
@@ -10,11 +11,11 @@ public class UserManagementServiceTest
     private Mock<IMapper> _mapperMock = new();
 
     [Fact]
-    public async Task GetUserAsync_WithNonExistentId_ReturnsNull()
+    public async Task GetUserAsync_WithNonExistentId_ReturnsNotFound()
     {
         // Arrange
         _userManagementRepositoryMock.Setup(x => x.GetUserAsync(It.IsAny<int>()))
-            .ReturnsAsync((User)null);
+            .ReturnsAsync((User)null!);
 
         var service = GetNewValidService();
 
@@ -22,7 +23,8 @@ public class UserManagementServiceTest
         var result = await service.GetUserAsync(1);
 
         // Assert
-        Assert.Null(result);
+        Assert.Single(result.Errors);
+        Assert.NotNull(result.Errors.FirstOrDefault(e => e is NotFoundError));
     }
 
     [Fact]
@@ -48,7 +50,8 @@ public class UserManagementServiceTest
 
         // Assert
         Assert.NotNull(result);
-        AssertUserData(result, testUser);
+        Assert.NotNull(result.Value);
+        AssertUserData(result.Value, testUser);
     }
 
     [Fact]
@@ -96,7 +99,8 @@ public class UserManagementServiceTest
         var result = await service.PatchUserAsync(1, new());
 
         // Assert
-        Assert.Null(result);
+        Assert.Single(result.Errors);
+        Assert.NotNull(result.Errors.FirstOrDefault(e => e is NotFoundError));
     }
 
     [Fact]
@@ -129,9 +133,9 @@ public class UserManagementServiceTest
 
         // Assert
         Assert.NotNull(result);
-        Assert.Equal(userDto.Name, result.Name);
-        Assert.Equal(existingUser.Email, result.Email);
-        Assert.Equal((int)userDto.State, (int)result.State);
+        Assert.Equal(userDto.Name, result.Value.Name);
+        Assert.Equal(existingUser.Email, result.Value.Email);
+        Assert.Equal((int)userDto.State, (int)result.Value.State);
     }
 
     [Fact]
@@ -164,9 +168,9 @@ public class UserManagementServiceTest
 
         // Assert
         Assert.NotNull(result);
-        Assert.Equal(existingUser.Name, result.Name);
-        Assert.Equal(userDto.Email, result.Email);
-        Assert.Equal((int)userDto.State, (int)result.State);
+        Assert.Equal(existingUser.Name, result.Value.Name);
+        Assert.Equal(userDto.Email, result.Value.Email);
+        Assert.Equal((int)userDto.State, (int)result.Value.State);
     }
 
     [Fact]
@@ -182,7 +186,8 @@ public class UserManagementServiceTest
         var result = await service.DeleteUserAsync(1);
 
         // Assert
-        Assert.False(result);
+        Assert.Single(result.Errors);
+        Assert.NotNull(result.Errors.FirstOrDefault(e => e is NotFoundError));
     }
 
     [Fact]
@@ -201,7 +206,7 @@ public class UserManagementServiceTest
         var result = await service.DeleteUserAsync(1);
 
         // Assert
-        Assert.True(result);
+        Assert.True(result.IsSuccess);
         _userManagementRepositoryMock.Verify(x => x.DeleteUserAsync(1), Times.Once);
     }
 

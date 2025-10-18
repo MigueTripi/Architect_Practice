@@ -6,6 +6,7 @@ using SelfResearch.UserManagement.API.Mapping;
 using System.Text.Json.Serialization;
 using Microsoft.Extensions.Azure;
 using SelfResearch.UserManagement.API.Features.UserManagement.CreateUser;
+using SelfResearch.Core.Infraestructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -76,6 +77,8 @@ builder.Services.AddAzureClients(builder =>
 {
     builder.AddServiceBusClient(azureServiceBusConnectionString);
 });
+
+FluentResultConfiguration.AddCustomErrorHandling();
 
 var app = builder.Build();
 

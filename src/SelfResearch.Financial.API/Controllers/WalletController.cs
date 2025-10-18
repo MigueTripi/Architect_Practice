@@ -1,5 +1,7 @@
-using Microsoft.AspNetCore.Http;
+using FluentResults;
+using FluentResults.Extensions.AspNetCore;
 using Microsoft.AspNetCore.Mvc;
+using SelfResearch.Core.Infraestructure.ErrorHandling;
 using SelfResearch.Financial.API.Feature.Wallet;
 
 namespace SelfResearch.Financial.API.Controllers
@@ -17,7 +19,6 @@ namespace SelfResearch.Financial.API.Controllers
             _retrieveWalletService = retrieveWalletService;
         }
 
-
         /// <summary>
         /// Retrieves a wallet by user identifier.
         /// </summary>
@@ -31,7 +32,7 @@ namespace SelfResearch.Financial.API.Controllers
         {
             if (userId <= 0)
             {
-                return BadRequest("Invalid user ID.");
+                return Result.Fail(new ArgumentError(nameof(userId), "User ID must be a positive integer.")).ToActionResult();
             }
 
             var result = await _retrieveWalletService.GetWalletsByUserAsync(userId);

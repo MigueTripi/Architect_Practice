@@ -1,4 +1,6 @@
 using AutoMapper;
+using FluentResults;
+using SelfResearch.Core.Infraestructure.ErrorHandling;
 
 namespace SelfResearch.UserManagement.API.Features.UserManagement.CreateUser;
 
@@ -16,13 +18,12 @@ public class UpdateUserService : IUpdateUserService
     }
 
     /// <inheritdoc/>
-        /// <inheritdoc/>
-    public async Task<UserDto?> UpdateUserStateAsync(int id, UserStateEnumDto newState)
+    public async Task<Result<UserDto>> UpdateUserStateAsync(int id, UserStateEnumDto newState)
     {
         var dbUser = await this._userManagementRepository.GetUserAsync(id);
         if (dbUser == null)
         {
-            return null;
+            return Result.Fail(new NotFoundError(id.ToString(), nameof(UserDto)));
         }
 
         //TODO: Add validation of state transitions
