@@ -4,10 +4,12 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
 using SelfResearch.UserManagement.API.Features.UserManagement.CreateUser;
+using SelfResearch.Core.Infraestructure.ErrorHandling;
+using FluentResults;
 
 namespace SelfResearch.UserManagement.API.Test.Controllers;
 
-public class UserControllerTest
+public class UserControllerTest: BaseTests
 {
     private Mock<ILogger<UserController>> _loggerMock = new();
     private Mock<IUserManagementService> _userManagementService = new();
@@ -34,7 +36,7 @@ public class UserControllerTest
     {
         // Arrange
         _userManagementService.Setup(x => x.GetUserAsync(It.IsAny<int>()))
-            .ReturnsAsync((UserDto)null);
+            .ReturnsAsync(Result.Fail(new NotFoundError("1", nameof(UserDto))));
         var controller = GetNewValidController();
 
         // Act
@@ -58,6 +60,22 @@ public class UserControllerTest
         // Assert
         var okResult = Assert.IsType<OkObjectResult>(result.Result);
         Assert.Equal(_existingTestUser, okResult.Value);
+    }
+
+    [Theory]
+    [InlineData(-1, 10)]
+    [InlineData(0, 0)]
+    [InlineData(0, -1)]
+    public async Task GetPagedUsers_WithInvalidParameters_ReturnsBadRequest(int skip, int take)
+    {
+        // Arrange
+        var controller = GetNewValidController();
+
+        // Act
+        var result = await controller.GetPagedUsers(skip, take);
+
+        // Assert
+        Assert.IsType<BadRequestObjectResult>(result.Result);
     }
 
     [Fact]
@@ -151,7 +169,7 @@ public class UserControllerTest
     {
         // Arrange
         _userManagementService.Setup(x => x.PatchUserAsync(It.IsAny<int>(), It.IsAny<Microsoft.AspNetCore.JsonPatch.JsonPatchDocument<UserDto>>()))
-            .ReturnsAsync((UserDto?)null);
+            .ReturnsAsync(Result.Fail(new NotFoundError("1", nameof(UserDto))));
         var controller = GetNewValidController();
 
         // Act
@@ -178,19 +196,31 @@ public class UserControllerTest
     }
 
     [Fact]
-    public async Task DeleteUser_ReturnsResult()
+    public async Task DeleteUser_ForValidUser_ReturnsOk()
     {
         // Arrange
         _userManagementService.Setup(x => x.DeleteUserAsync(1))
-            .ReturnsAsync(true);
+            .ReturnsAsync(Result.Ok(true));
         var controller = GetNewValidController();
 
         // Act
         var result = await controller.DeleteUser(1);
 
         // Assert
-        var okResult = Assert.IsType<OkObjectResult>(result.Result);
-        Assert.True((bool)okResult.Value);
+        Assert.IsType<OkObjectResult>(result.Result);
+    }
+
+    [Fact]
+    public async Task DeleteUser_ForInvalidUser_ReturnsBadRequest()
+    {
+        // Arrange
+        var controller = GetNewValidController();
+
+        // Act
+        var result = await controller.DeleteUser(0);
+
+        // Assert
+        Assert.IsType<BadRequestObjectResult>(result.Result);
     }
 
     [Theory]
@@ -210,11 +240,11 @@ public class UserControllerTest
     }
 
     [Fact]
-    public async Task UpdateStateAsync_WithInexistingUser_ReturnsNotFound()
+    public async Task UpdateStateAsync_WithNonExistingUser_ReturnsNotFound()
     {
         // Arrange
         _updateUserService.Setup(x => x.UpdateUserStateAsync(It.IsAny<int>(), It.IsAny<UserStateEnumDto>()))
-            .ReturnsAsync((UserDto?)null);
+            .ReturnsAsync(Result.Fail(new NotFoundError("1", nameof(UserDto))));
         var controller = GetNewValidController();
 
         // Act

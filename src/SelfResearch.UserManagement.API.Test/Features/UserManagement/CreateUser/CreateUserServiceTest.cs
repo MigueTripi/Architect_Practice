@@ -2,6 +2,7 @@
 using SelfResearch.UserManagement.API.Features.UserManagement;
 using Moq;
 using SelfResearch.UserManagement.API.Features.UserManagement.CreateUser;
+using SelfResearch.Core.Infraestructure.ErrorHandling;
 
 namespace SelfResearch.UserManagement.API.Test.Features.UserManagement.CreateUser;
 
@@ -56,9 +57,31 @@ public class CreateUserServiceTest
         var result = await service.CreateUserAsync(userDto);
 
         // Assert
-        Assert.Equal(userDto.Name, result.Name);
-        Assert.Equal(userDto.Email, result.Email);
-        Assert.Equal((int)UserStateEnumDto.Initial, (int)result.State);
+        Assert.Equal(userDto.Name, result.Value.Name);
+        Assert.Equal(userDto.Email, result.Value.Email);
+        Assert.Equal((int)UserStateEnumDto.Initial, (int)result.Value.State);
+    }
+
+    [Fact]
+    public async Task CreateUserAsync_WithIncorrectDto_ReturnsFailedResult()
+    {
+        // Arrange
+        UserDto userDto = new UserDto()
+        {
+            Id = 1,
+            Name = "invalid id",
+            Email = "mail@dto.com",
+            State = UserStateEnumDto.Active
+        };
+
+        var service = GetNewValidService();
+
+        // Act
+        var result = await service.CreateUserAsync(userDto);
+
+        // Assert
+        Assert.Single(result.Errors);
+        Assert.NotNull(result.Errors.FirstOrDefault(e => e is ArgumentError));
     }
 
     private CreateUserService GetNewValidService()

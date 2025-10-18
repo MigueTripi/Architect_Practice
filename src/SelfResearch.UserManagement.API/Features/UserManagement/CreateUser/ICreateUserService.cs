@@ -1,4 +1,4 @@
-using System;
+using FluentResults;
 
 namespace SelfResearch.UserManagement.API.Features.UserManagement.CreateUser;
 
@@ -9,5 +9,5 @@ public interface ICreateUserService
     /// </summary>
     /// <param name="userDto">The user to create</param>
     /// <returns>The created user</returns>
-    Task<UserDto> CreateUserAsync(UserDto userDto);
+    Task<Result<UserDto>> CreateUserAsync(UserDto userDto);
 }

@@ -2,6 +2,7 @@
 using SelfResearch.UserManagement.API.Features.UserManagement;
 using Moq;
 using SelfResearch.UserManagement.API.Features.UserManagement.CreateUser;
+using SelfResearch.Core.Infraestructure.ErrorHandling;
 
 namespace SelfResearch.UserManagement.API.Test.Features.UserManagement.UpdateUser;
 
@@ -23,7 +24,8 @@ public class UpdateUserServiceTest
         var result = await service.UpdateUserStateAsync(1, UserStateEnumDto.Active);
 
         // Assert
-        Assert.Null(result);
+        Assert.Single(result.Errors);
+        Assert.NotNull(result.Errors.FirstOrDefault(e => e is NotFoundError));
     }
 
     [Fact]
@@ -51,7 +53,7 @@ public class UpdateUserServiceTest
 
         // Assert
         Assert.NotNull(result);
-        AssertUserData(result!, user);
+        AssertUserData(result.Value, user);
         _userManagementRepositoryMock.Verify(x => x.UpdateUserAsync(), Times.Once);
     }
 

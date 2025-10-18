@@ -1,6 +1,8 @@
 using System;
 using AutoMapper;
+using FluentResults;
 using Microsoft.AspNetCore.JsonPatch;
+using SelfResearch.Core.Infraestructure.ErrorHandling;
 
 namespace SelfResearch.UserManagement.API.Features.UserManagement;
 
@@ -18,9 +20,13 @@ public class UserManagementService : IUserManagementService
     }
 
     /// <inheritdoc/>
-    public async Task<UserDto?> GetUserAsync(int id)
+    public async Task<Result<UserDto?>> GetUserAsync(int id)
     {
         var dbUser = await _userManagementRepository.GetUserAsync(id);
+        if (dbUser == null)
+        {
+            return Result.Fail(new NotFoundError(id.ToString(), nameof(UserDto)));
+        }
 
         return this._mapper.Map<UserDto>(dbUser);
     }
@@ -33,12 +39,12 @@ public class UserManagementService : IUserManagementService
     }
 
     /// <inheritdoc/>
-    public async Task<UserDto?> PatchUserAsync(int id, JsonPatchDocument<UserDto> patchingDocument)
+    public async Task<Result<UserDto>> PatchUserAsync(int id, JsonPatchDocument<UserDto> patchingDocument)
     {
         var dbUser = await this._userManagementRepository.GetUserAsync(id);
         if (dbUser == null)
         {
-            return null;
+            return Result.Fail(new NotFoundError(id.ToString(), nameof(UserDto)));
         }
 
         var userDto = this._mapper.Map<UserDto>(dbUser);
@@ -47,19 +53,19 @@ public class UserManagementService : IUserManagementService
         this._mapper.Map(userDto, dbUser);
 
         await this._userManagementRepository.UpdateUserAsync();
-        return userDto;
+        return Result.Ok(userDto);
     }
 
     /// <inheritdoc/>
-    public async Task<bool> DeleteUserAsync(int id)
+    public async Task<Result<bool>> DeleteUserAsync(int id)
     {
         var dbUser = await this._userManagementRepository.GetUserAsync(id);
         if (dbUser == null)
         {
-            return false;
+            return Result.Fail(new NotFoundError(id.ToString(), nameof(UserDto)));
         }
 
         await this._userManagementRepository.DeleteUserAsync(id);
-        return true;
+        return Result.Ok(true);
     }
 }

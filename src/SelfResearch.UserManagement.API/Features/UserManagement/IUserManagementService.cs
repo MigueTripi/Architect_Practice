@@ -1,4 +1,4 @@
-using System;
+using FluentResults;
 using Microsoft.AspNetCore.JsonPatch;
 
 namespace SelfResearch.UserManagement.API.Features.UserManagement;
@@ -9,8 +9,8 @@ public interface IUserManagementService
     /// Gets a user by its identifier.
     /// </summary>
     /// <param name="id">The user identifier</param>
-    /// <returns>The user</returns>
-    Task<UserDto?> GetUserAsync(int id);
+    /// <returns>The user's result</returns>
+    Task<Result<UserDto?>> GetUserAsync(int id);
 
     /// <summary>
     /// Gets a paged list of users.
@@ -24,14 +24,14 @@ public interface IUserManagementService
     /// Deletes a user by its identifier.
     /// </summary>
     /// <param name="id">The identifier</param>
-    /// <returns>If operation finished sucessfully</returns>
-    Task<bool> DeleteUserAsync(int id);
+    /// <returns>Result indicating if operation finished sucessfully</returns>
+    Task<Result<bool>> DeleteUserAsync(int id);
 
     /// <summary>
     /// Patches the user.
     /// </summary>
     /// <param name="id">The user identifier</param>
     /// <param name="patchingDocument">The patching document</param>
-    /// <returns>The updated user</returns>
-    Task<UserDto?> PatchUserAsync(int id, JsonPatchDocument<UserDto> patchingDocument);
+    /// <returns>The result for the updated user</returns>
+    Task<Result<UserDto>> PatchUserAsync(int id, JsonPatchDocument<UserDto> patchingDocument);
 }

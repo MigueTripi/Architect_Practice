@@ -1,4 +1,6 @@
 using AutoMapper;
+using FluentResults;
+using SelfResearch.Core.Infraestructure.ErrorHandling;
 using SelfResearch.UserManagement.API.Contracts;
 
 namespace SelfResearch.UserManagement.API.Features.UserManagement.CreateUser;
@@ -20,8 +22,13 @@ public class CreateUserService : ICreateUserService
     }
 
     /// <inheritdoc/>
-    public async Task<UserDto> CreateUserAsync(UserDto userDto)
+    public async Task<Result<UserDto>> CreateUserAsync(UserDto userDto)
     {
+        if (userDto.Id != 0)
+        {
+            return Result.Fail(new ArgumentError(nameof(userDto.Id), "User ID must be zero for creation."));
+        }
+
         userDto.State = UserStateEnumDto.Initial;
         var user = await this._userManagementRepository.CreateUserAsync(this._mapper.Map<User>(userDto));
         var result = this._mapper.Map<UserDto>(user);
@@ -32,7 +39,7 @@ public class CreateUserService : ICreateUserService
             State = (int)user.State
         });
 
-        return result;
+        return Result.Ok(result);
     }
 
 }
