@@ -33,7 +33,7 @@ namespace SelfResearch.UserManagement.API.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<UserDto?>> GetUserById(int id)
+        public async Task<ActionResult<UserDto>> GetUserById(int id)
         {
             if (id <= 0)
             {
@@ -42,8 +42,8 @@ namespace SelfResearch.UserManagement.API.Controllers
 
             var result = await _userManagementService.GetUserAsync(id);
 
-            return result.ToCustomActionResult();
-        }
+            return result!.ToCustomActionResult()!;
+            }
 
         [HttpGet("GetPaged")]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -79,12 +79,9 @@ namespace SelfResearch.UserManagement.API.Controllers
             }
 
             var newUserResult = await this._createUserService.CreateUserAsync(user);
+
             return newUserResult!.ToCustomActionResult(
-                new CreatedAtActionResult(
-                    actionName: nameof(GetUserById),
-                    controllerName: nameof(UserController),
-                    routeValues: new { id = newUserResult.Value.Id },
-                    newUserResult.Value!)
+                CreatedAtAction(nameof(GetUserById), new { id = newUserResult.Value.Id }, newUserResult.Value)
             )!;
         }
 

@@ -20,7 +20,7 @@ public class UserManagementService : IUserManagementService
     }
 
     /// <inheritdoc/>
-    public async Task<Result<UserDto?>> GetUserAsync(int id)
+    public async Task<Result<UserDto>> GetUserAsync(int id)
     {
         var dbUser = await _userManagementRepository.GetUserAsync(id);
         if (dbUser == null)
