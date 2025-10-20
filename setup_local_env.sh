@@ -31,6 +31,7 @@ docker compose build digitalwallet-web
 docker compose up digitalwallet-web -d 
 
 
-echo "API local/Docker: http://localhost:5266"
-echo "Web local/Docker: http://localhost:4222"
-echo "Nginx reverse proxy: http://localhost:8081"
+echo "User Management API Docker: http://localhost:5266"
+echo "Financial API Docker: http://localhost:5255"
+echo "Web Docker: http://localhost:4222"
+# echo "Nginx reverse proxy: http://localhost:8081"

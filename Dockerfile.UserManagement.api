@@ -11,9 +11,12 @@ ENV PATH="$PATH:/root/.dotnet/tools"
 
 # Copy csproj and restore nuget packages for required projects
 COPY src/SelfResearch.UserManagement.API/SelfResearch.UserManagement.API.csproj src/SelfResearch.UserManagement.API/
+
 COPY src/SelfResearch.UserManagement.API.Contracts/SelfResearch.UserManagement.API.Contracts.csproj src/SelfResearch.UserManagement.API.Contracts/
 COPY src/SelfResearch.Financial.API.Contracts/SelfResearch.Financial.API.Contracts.csproj src/SelfResearch.Financial.API.Contracts/
+COPY src/SelfResearch.Core.Infraestructure/SelfResearch.Core.Infraestructure.csproj src/SelfResearch.Core.Infraestructure/
 
+# This should be a nuget package
 WORKDIR /src/src/SelfResearch.UserManagement.API.Contracts/
 RUN dotnet restore SelfResearch.UserManagement.API.Contracts.csproj
 COPY src/SelfResearch.UserManagement.API.Contracts/. .
@@ -22,6 +25,12 @@ COPY src/SelfResearch.UserManagement.API.Contracts/. .
 WORKDIR /src/src/SelfResearch.Financial.API.Contracts/
 RUN dotnet restore SelfResearch.Financial.API.Contracts.csproj
 COPY src/SelfResearch.Financial.API.Contracts/. .
+
+# This should be a nuget package
+WORKDIR /src/src/SelfResearch.Core.Infraestructure/
+RUN dotnet restore SelfResearch.Core.Infraestructure.csproj
+COPY src/SelfResearch.Core.Infraestructure/. .
+
 
 WORKDIR /src/src/SelfResearch.UserManagement.API/
 RUN dotnet restore SelfResearch.UserManagement.API.csproj
