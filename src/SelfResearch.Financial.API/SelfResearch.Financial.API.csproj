@@ -11,6 +11,7 @@
     <PackageReference Include="AutoMapper" Version="15.0.1" />
     <PackageReference Include="Azure.Messaging.ServiceBus" Version="7.20.1" />
     <PackageReference Include="DotNetEnv" Version="3.1.1" />
+    <PackageReference Include="FluentResults" Version="4.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.8" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.9" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.9">
@@ -35,7 +36,8 @@
 
   <ItemGroup>
     <ProjectReference Include="../SelfResearch.Financial.API.Contracts/SelfResearch.Financial.API.Contracts.csproj" />
-    <!-- TODO: This reference should be a package reference instead. -->
+    <!-- TODO: Those references should be a package reference instead. -->
+    <ProjectReference Include="../SelfResearch.Core.Infraestructure/SelfResearch.Core.Infraestructure.csproj" />
     <ProjectReference Include="../SelfResearch.UserManagement.API.Contracts/SelfResearch.UserManagement.API.Contracts.csproj" />
   </ItemGroup>
 

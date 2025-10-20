@@ -73,6 +73,19 @@ The following is the tech slack for solving the challenge
 | EF        | 9.0.9   |
 |Azure Service Bus |  |
 
+
+### Project architecture
+
+The project code is organized in the following way:
+TBD
+
+
+### External dependencies
+There are some external nuget packaged that were included to achieve the project objetives:
+
+- [FluentResults](https://www.nuget.org/packages/FluentResults)
+- [NServiceBus](https://www.nuget.org/packages/NServiceBus)
+
 ### Microservices overview
 
 #### User management

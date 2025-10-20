@@ -1,5 +1,6 @@
 using AutoMapper;
 using Microsoft.Extensions.Logging.Abstractions;
+using SelfResearch.Core.Infraestructure;
 using SelfResearch.Financial.API.Feature.Wallet;
 
 namespace SelfResearch.Financial.API.Test;
@@ -18,5 +19,7 @@ public class BaseTests
         NullLoggerFactory.Instance);
 
         _mapper = _config.CreateMapper();
+
+        FluentResultConfiguration.AddCustomErrorHandling();
     }
 }

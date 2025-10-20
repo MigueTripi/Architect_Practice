@@ -7,6 +7,8 @@ using SelfResearch.Financial.API.Feature.Wallet.RetrieveWallet;
 using Microsoft.Extensions.Azure;
 using SelfResearch.Financial.API.Feature.Propagate;
 using SelfResearch.Financial.API.Feature.Wallet.CreateWalet;
+using SelfResearch.Core.Infraestructure;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -82,6 +84,7 @@ builder.Services.AddAzureClients(builder =>
     builder.AddServiceBusClient(azureServiceBusConnectionString);
 });
 
+FluentResultConfiguration.AddCustomErrorHandling();
 
 
 var app = builder.Build();

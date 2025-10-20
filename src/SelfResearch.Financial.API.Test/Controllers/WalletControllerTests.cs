@@ -1,5 +1,3 @@
-using System;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -8,7 +6,7 @@ using SelfResearch.Financial.API.Feature.Wallet;
 
 namespace SelfResearch.Financial.API.Test.Controllers;
 
-public class WalletControllerTests
+public class WalletControllerTests : BaseTests
 {
 
     private Mock<IRetrieveWalletService> _retrieveWalletServiceMock = new(MockBehavior.Strict);
