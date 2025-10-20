@@ -42,7 +42,7 @@ namespace SelfResearch.UserManagement.API.Controllers
 
             var result = await _userManagementService.GetUserAsync(id);
 
-            return result!.ToCustomActionResult()!;
+            return result.ToCustomActionResult()!;
             }
 
         [HttpGet("GetPaged")]

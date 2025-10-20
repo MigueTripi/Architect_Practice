@@ -10,7 +10,7 @@ public interface IUserManagementService
     /// </summary>
     /// <param name="id">The user identifier</param>
     /// <returns>The user's result</returns>
-    Task<Result<UserDto>> GetUserAsync(int id);
+    Task<Result<UserDto?>> GetUserAsync(int id);
 
     /// <summary>
     /// Gets a paged list of users.
