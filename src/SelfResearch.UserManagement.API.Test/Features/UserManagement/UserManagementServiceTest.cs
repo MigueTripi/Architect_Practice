@@ -2,6 +2,7 @@
 using SelfResearch.UserManagement.API.Features.UserManagement;
 using Moq;
 using SelfResearch.Core.Infraestructure.ErrorHandling;
+using Microsoft.AspNetCore.JsonPatch;
 
 namespace SelfResearch.UserManagement.API.Test.Features.UserManagement;
 
@@ -87,6 +88,26 @@ public class UserManagementServiceTest
     }
 
     [Fact]
+    public async Task PatchUserAsync_WithStatePropertyOnOperations_ReturnsArgumentError()
+    {
+        // Arrange
+        _userManagementRepositoryMock.Setup(x => x.GetUserAsync(It.IsAny<int>()))
+            .ReturnsAsync((User?)null);
+
+        var service = GetNewValidService();
+
+        JsonPatchDocument<UserDto> doc = CreateDummyPatchDocument();
+        doc.Replace(u => u.State, UserStateEnumDto.Active);
+
+        // Act
+        var result = await service.PatchUserAsync(1, doc);
+
+        // Assert
+        Assert.Single(result.Errors);
+        Assert.NotNull(result.Errors.FirstOrDefault(e => e is ArgumentError));
+    }
+
+    [Fact]
     public async Task PatchUserAsync_WithNonExistentUser_ReturnsNull()
     {
         // Arrange
@@ -96,7 +117,7 @@ public class UserManagementServiceTest
         var service = GetNewValidService();
 
         // Act
-        var result = await service.PatchUserAsync(1, new());
+        var result = await service.PatchUserAsync(1, CreateDummyPatchDocument());
 
         // Assert
         Assert.Single(result.Errors);
@@ -109,7 +130,7 @@ public class UserManagementServiceTest
         // Arrange
         var userDto = new UserDto { Id = 1, Name = "Updated User", Email = "updated@test.com", State = UserStateEnumDto.Inactive };
         var existingUser = new User { Id = 1, Name = "Original User", Email = "original@test.com", State = UserStateEnum.Inactive };
-        var patchDoc = new Microsoft.AspNetCore.JsonPatch.JsonPatchDocument<UserDto>();
+        var patchDoc = CreateDummyPatchDocument();
         patchDoc.Replace(u => u.Name, userDto.Name);
 
         _userManagementRepositoryMock.Setup(x => x.GetUserAsync(userDto.Id))
@@ -144,7 +165,7 @@ public class UserManagementServiceTest
         // Arrange
         var userDto = new UserDto { Id = 1, Name = "Original User", Email = "updated@test.com", State = UserStateEnumDto.Inactive };
         var existingUser = new User { Id = 1, Name = "Original User", Email = "original@test.com", State = UserStateEnum.Inactive };
-        var patchDoc = new Microsoft.AspNetCore.JsonPatch.JsonPatchDocument<UserDto>();
+        var patchDoc = CreateDummyPatchDocument(userDto.Name);
         patchDoc.Replace(u => u.Email, userDto.Email);
 
         _userManagementRepositoryMock.Setup(x => x.GetUserAsync(userDto.Id))
@@ -214,12 +235,19 @@ public class UserManagementServiceTest
     {
         return new UserManagementService(_userManagementRepositoryMock.Object, this._mapperMock.Object);
     }
-    
+
     private void AssertUserData(UserDto dto, User user)
     {
         Assert.Equal(dto.Id, user.Id);
         Assert.Equal(dto.Name, user.Name);
         Assert.Equal(dto.Email, user.Email);
         Assert.Equal((int)dto.State, (int)user.State);
+    }
+    
+    private JsonPatchDocument<UserDto> CreateDummyPatchDocument(string? value = null)
+    {
+        var patchDoc = new JsonPatchDocument<UserDto>();
+        patchDoc.Replace(u=> u.Name, value);
+        return patchDoc;
     }
 }

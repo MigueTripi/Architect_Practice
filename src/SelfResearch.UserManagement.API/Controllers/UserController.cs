@@ -99,6 +99,10 @@ namespace SelfResearch.UserManagement.API.Controllers
             {
                 return Result.Fail(new ArgumentError(nameof(patchingDocument), "Patching document is required.")).ToActionResult();
             }
+            if (patchingDocument.Operations is {Count: 0})
+            {
+                return Result.Fail(new ArgumentError(nameof(patchingDocument), "Patching document must have operations.")).ToActionResult();
+            }
 
             var updatedUserResult = await this._userManagementService.PatchUserAsync(id, patchingDocument);
             return updatedUserResult.ToActionResult();
