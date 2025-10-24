@@ -6,6 +6,7 @@ using Moq;
 using SelfResearch.UserManagement.API.Features.UserManagement.CreateUser;
 using SelfResearch.Core.Infraestructure.ErrorHandling;
 using FluentResults;
+using Microsoft.AspNetCore.JsonPatch;
 
 namespace SelfResearch.UserManagement.API.Test.Controllers;
 
@@ -138,7 +139,7 @@ public class UserControllerTest: BaseTests
     }
 
     [Fact]
-    public async Task PatchUser_WithNullDocoument_ReturnsBadRequest()
+    public async Task PatchUser_WithNullDocument_ReturnsBadRequest()
     {
         // Arrange
         var controller = GetNewValidController();
@@ -150,6 +151,18 @@ public class UserControllerTest: BaseTests
         Assert.IsType<BadRequestObjectResult>(result.Result);
     }
 
+    [Fact]
+    public async Task PatchUser_WithEmptyOperations_ReturnsBadRequest()
+    {
+        // Arrange
+        var controller = GetNewValidController();
+
+        // Act
+        var result = await controller.PatchUser(1, new());
+
+        // Assert
+        Assert.IsType<BadRequestObjectResult>(result.Result);
+    }
 
     [Fact]
     public async Task PatchUser_WithInvalidId_ReturnsBadRequest()
@@ -168,12 +181,14 @@ public class UserControllerTest: BaseTests
     public async Task PatchUser_WithNonExistentUser_ReturnsNotFound()
     {
         // Arrange
-        _userManagementService.Setup(x => x.PatchUserAsync(It.IsAny<int>(), It.IsAny<Microsoft.AspNetCore.JsonPatch.JsonPatchDocument<UserDto>>()))
+        _updateUserService.Setup(x => x.PatchUserAsync(It.IsAny<int>(), It.IsAny<Microsoft.AspNetCore.JsonPatch.JsonPatchDocument<UserDto>>()))
             .ReturnsAsync(Result.Fail(new NotFoundError("1", nameof(UserDto))));
         var controller = GetNewValidController();
 
         // Act
-        var result = await controller.PatchUser(1, new());
+        JsonPatchDocument<UserDto> doc = new();
+        doc.Replace(u => u.Name, "Updated Name");
+        var result = await controller.PatchUser(1, doc);
 
         // Assert
         Assert.IsType<NotFoundObjectResult>(result.Result);
@@ -183,12 +198,14 @@ public class UserControllerTest: BaseTests
     public async Task PatchUser_WithValidUser_ReturnsUpdatedUser()
     {
         // Arrange
-        _userManagementService.Setup(x => x.PatchUserAsync(It.IsAny<int>(), It.IsAny<Microsoft.AspNetCore.JsonPatch.JsonPatchDocument<UserDto>>()))
+        _updateUserService.Setup(x => x.PatchUserAsync(It.IsAny<int>(), It.IsAny<Microsoft.AspNetCore.JsonPatch.JsonPatchDocument<UserDto>>()))
             .ReturnsAsync(_existingTestUser);
         var controller = GetNewValidController();
 
         // Act
-        var result = await controller.PatchUser(1, new());
+        JsonPatchDocument<UserDto> doc = new();
+        doc.Replace(u => u.Name, "Updated Name");
+        var result = await controller.PatchUser(1, doc);
 
         // Assert
         var okResult = Assert.IsType<OkObjectResult>(result.Result);

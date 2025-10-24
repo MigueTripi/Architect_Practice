@@ -1,5 +1,6 @@
 using AutoMapper;
 using FluentResults;
+using Microsoft.AspNetCore.JsonPatch;
 using SelfResearch.Core.Infraestructure.ErrorHandling;
 
 namespace SelfResearch.UserManagement.API.Features.UserManagement.CreateUser;
@@ -34,6 +35,28 @@ public class UpdateUserService : IUpdateUserService
         //TODO: Publish service bus event
 
         return this._mapper.Map<UserDto>(dbUser);
+    }
+
+    /// <inheritdoc/>
+    public async Task<Result<UserDto>> PatchUserAsync(int id, JsonPatchDocument<UserDto> patchingDocument)
+    {
+        if (patchingDocument.Operations.Any(x=> x.path.Contains("State")))
+        {
+            return Result.Fail(new ArgumentError(nameof(patchingDocument), "State field cannot be modified via patching."));
+        }
+        var dbUser = await this._userManagementRepository.GetUserAsync(id);
+        if (dbUser == null)
+        {
+            return Result.Fail(new NotFoundError(id.ToString(), nameof(UserDto)));
+        }
+
+        var userDto = this._mapper.Map<UserDto>(dbUser);
+        patchingDocument.ApplyTo(userDto);
+
+        this._mapper.Map(userDto, dbUser);
+
+        await this._userManagementRepository.UpdateUserAsync();
+        return Result.Ok(userDto);
     }
 
 }
