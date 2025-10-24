@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace SelfResearch.UserManagement.API.Features.UserManagement;
 
 /// <summary>
@@ -20,5 +22,6 @@ public class UserDto
     /// <summary>
     /// The user state
     /// </summary>
+    [JsonConverter(typeof(JsonStringEnumConverter))]
     public UserStateEnumDto State { get; set; }
 }
