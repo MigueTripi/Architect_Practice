@@ -5,6 +5,7 @@ using SelfResearch.UserManagement.API.Features.UserManagement.CreateUser;
 using FluentResults;
 using SelfResearch.Core.Infraestructure.ErrorHandling;
 using FluentResults.Extensions.AspNetCore;
+using System.Net.Mail;
 
 namespace SelfResearch.UserManagement.API.Controllers
 {
@@ -76,6 +77,13 @@ namespace SelfResearch.UserManagement.API.Controllers
             if (user.Id != 0)
             {
                 return Result.Fail(new ArgumentError(nameof(user.Id), "User ID must be zero for creation.")).ToActionResult();
+            }
+
+            //TODO: This validation is not enough due to m@m.com. is condidered valid (?. Just an example.
+            MailAddress.TryCreate(user.Email, out var emailAddress);
+            if (emailAddress == null || emailAddress.Address != user.Email)
+            {
+                return Result.Fail(new ArgumentError(nameof(user.Email), $"A valid email address is required. {emailAddress?.Address}")).ToActionResult();
             }
 
             var newUserResult = await this._createUserService.CreateUserAsync(user);

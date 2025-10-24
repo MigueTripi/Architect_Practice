@@ -17,7 +17,7 @@ public class UserControllerTest: BaseTests
     private Mock<ICreateUserService> _createUserService = new();
     private Mock<IUpdateUserService> _updateUserService = new();
     private UserDto _existingTestUser = new UserDto { Id = 1, Name = "Existing User" };
-    private UserDto _newTestUser = new UserDto { Id = 0, Name = "New User" };
+    private UserDto _newTestUser = new UserDto { Id = 0, Name = "New User", Email = "mail@gmail.com"};
 
     [Fact]
     public async Task GetUserById_WithInvalidId_ReturnsBadRequest()
@@ -117,6 +117,19 @@ public class UserControllerTest: BaseTests
 
         // Act
         var result = await controller.CreateUser(new() { Id = 1, Name = "Existing User" });
+
+        // Assert
+        Assert.IsType<BadRequestObjectResult>(result.Result);
+    }
+
+    [Fact]
+    public async Task CreateUser_WithInvalidEmailFormat_ReturnsBadRequest()
+    {
+        // Arrange
+        var controller = GetNewValidController();
+
+        // Act
+        var result = await controller.CreateUser(new() { Id = 1, Name = "Existing User", Email = "invalid-email-format" });
 
         // Assert
         Assert.IsType<BadRequestObjectResult>(result.Result);
