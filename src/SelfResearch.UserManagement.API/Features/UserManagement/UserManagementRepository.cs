@@ -1,6 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using SelfResearch.UserManagement.API.Core.Data;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 
 namespace SelfResearch.UserManagement.API.Features.UserManagement;
 
@@ -47,4 +48,11 @@ public class UserManagementRepository : IUserManagementRepository
         }
         await this._dbContext.SaveChangesAsync();
     }
+
+    /// <inheritdoc/>
+    public async Task<User?> FindUserByPredicateAsync(Expression<Func<User, bool>> predicate)
+    {
+        return await this._dbContext.Users.FirstOrDefaultAsync(predicate: predicate);
+    }
+
 }

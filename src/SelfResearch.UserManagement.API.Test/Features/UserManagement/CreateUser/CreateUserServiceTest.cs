@@ -3,6 +3,8 @@ using SelfResearch.UserManagement.API.Features.UserManagement;
 using Moq;
 using SelfResearch.UserManagement.API.Features.UserManagement.CreateUser;
 using SelfResearch.Core.Infraestructure.ErrorHandling;
+using System.Linq.Expressions;
+using SelfResearch.UserManagement.API.Contracts;
 
 namespace SelfResearch.UserManagement.API.Test.Features.UserManagement.CreateUser;
 
@@ -51,6 +53,10 @@ public class CreateUserServiceTest
         _userManagementRepositoryMock.Setup(x => x.CreateUserAsync(It.IsAny<User>()))
             .ReturnsAsync((User anUser) => { return anUser; });
 
+        _messageSesionMock.Setup(x => x.Publish(
+            It.IsAny<UserCreationSucceedMessage>(), It.IsAny<PublishOptions>(), It.IsAny<CancellationToken>()))
+            .Returns(Task.CompletedTask);
+
         var service = GetNewValidService();
 
         // Act
@@ -60,6 +66,9 @@ public class CreateUserServiceTest
         Assert.Equal(userDto.Name, result.Value.Name);
         Assert.Equal(userDto.Email, result.Value.Email);
         Assert.Equal((int)UserStateEnumDto.Initial, (int)result.Value.State);
+        _messageSesionMock.Verify(x => x.Publish(
+            It.IsAny<UserCreationSucceedMessage>(), It.IsAny<PublishOptions>(), It.IsAny<CancellationToken>()
+            ), Times.Once);
     }
 
     [Fact]
@@ -82,6 +91,43 @@ public class CreateUserServiceTest
         // Assert
         Assert.Single(result.Errors);
         Assert.NotNull(result.Errors.FirstOrDefault(e => e is ArgumentError));
+    }
+
+    [Theory]
+    [InlineData("duplicated name", "duplicated name", "db@email.com", "valid@email.com", "A user with the same name already exists.")]
+    [InlineData("DUPLICATED name", "duplicated name", "db@email.com", "valid@email.com", "A user with the same name already exists.")]
+    [InlineData("DUPLICATED name ", " duplicated name", "db@email.com", "valid@email.com", "A user with the same name already exists.")]
+    [InlineData("valid name", "db name", "duplicated@email.com", "duplicated@email.com", "A user with the same email already exists.")]
+    [InlineData("VALID name", "DB name", "duplicated@email.com", "duplicated@EMAIL.com", "A user with the same email already exists.")]
+    public async Task CreateUserAsync_WithExistingUser_ReturnsFailedResult(string dtoName, string dbName, string dtoEmail, string dbEmail, string expectedMessage)
+    {
+        // Arrange
+        UserDto userDto = new UserDto()
+        {
+            Name = dtoName,
+            Email = dtoEmail,
+            State = UserStateEnumDto.Active
+        };
+
+        _userManagementRepositoryMock.Setup(x => x.FindUserByPredicateAsync(It.IsAny<Expression<Func<User, bool>>>()))
+            .ReturnsAsync(new User
+            {
+                Id = 99,
+                Name = dbName,
+                Email = dbEmail,
+                State = UserStateEnum.Active
+            });
+
+        var service = GetNewValidService();
+
+        // Act
+        var result = await service.CreateUserAsync(userDto);
+
+        // Assert
+        Assert.Single(result.Errors);
+        var error = result.Errors.First(e => e is ArgumentError);
+        Assert.NotNull(error);
+        Assert.Contains(expectedMessage, error.Message);
     }
 
     private CreateUserService GetNewValidService()

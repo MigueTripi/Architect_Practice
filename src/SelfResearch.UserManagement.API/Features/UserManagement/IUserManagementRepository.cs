@@ -1,4 +1,5 @@
 using System;
+using System.Linq.Expressions;
 
 namespace SelfResearch.UserManagement.API.Features.UserManagement;
 
@@ -10,7 +11,6 @@ public interface IUserManagementRepository
     /// <param name="id">The user identifier</param>
     /// <returns>The user</returns>
     Task<User?> GetUserAsync(int id);
-
 
     /// <summary>
     /// Gets a paged list of users.
@@ -39,4 +39,11 @@ public interface IUserManagementRepository
     /// <param name="id">The identifier</param>
     /// <returns>The task</returns>
     Task DeleteUserAsync(int id);
+
+    /// <summary>
+    /// Retrieves a existing user based on a predicate.
+    /// </summary>
+    /// <param name="predicate">The predicate</param>
+    /// <returns>The existing user</returns>
+    Task<User?> FindUserByPredicateAsync(Expression<Func<User, bool>> predicate);
 }

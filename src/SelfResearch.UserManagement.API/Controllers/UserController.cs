@@ -81,7 +81,7 @@ namespace SelfResearch.UserManagement.API.Controllers
             var newUserResult = await this._createUserService.CreateUserAsync(user);
 
             return newUserResult!.ToCustomActionResult(
-                CreatedAtAction(nameof(GetUserById), new { id = newUserResult.Value.Id }, newUserResult.Value)
+                CreatedAtAction(nameof(GetUserById), new { id = newUserResult.ValueOrDefault?.Id }, newUserResult.ValueOrDefault)
             )!;
         }
 
