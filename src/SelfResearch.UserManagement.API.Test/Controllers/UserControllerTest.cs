@@ -181,7 +181,7 @@ public class UserControllerTest: BaseTests
     public async Task PatchUser_WithNonExistentUser_ReturnsNotFound()
     {
         // Arrange
-        _userManagementService.Setup(x => x.PatchUserAsync(It.IsAny<int>(), It.IsAny<Microsoft.AspNetCore.JsonPatch.JsonPatchDocument<UserDto>>()))
+        _updateUserService.Setup(x => x.PatchUserAsync(It.IsAny<int>(), It.IsAny<Microsoft.AspNetCore.JsonPatch.JsonPatchDocument<UserDto>>()))
             .ReturnsAsync(Result.Fail(new NotFoundError("1", nameof(UserDto))));
         var controller = GetNewValidController();
 
@@ -198,7 +198,7 @@ public class UserControllerTest: BaseTests
     public async Task PatchUser_WithValidUser_ReturnsUpdatedUser()
     {
         // Arrange
-        _userManagementService.Setup(x => x.PatchUserAsync(It.IsAny<int>(), It.IsAny<Microsoft.AspNetCore.JsonPatch.JsonPatchDocument<UserDto>>()))
+        _updateUserService.Setup(x => x.PatchUserAsync(It.IsAny<int>(), It.IsAny<Microsoft.AspNetCore.JsonPatch.JsonPatchDocument<UserDto>>()))
             .ReturnsAsync(_existingTestUser);
         var controller = GetNewValidController();
 

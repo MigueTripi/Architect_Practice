@@ -26,12 +26,4 @@ public interface IUserManagementService
     /// <param name="id">The identifier</param>
     /// <returns>Result indicating if operation finished sucessfully</returns>
     Task<Result<bool>> DeleteUserAsync(int id);
-
-    /// <summary>
-    /// Patches the user.
-    /// </summary>
-    /// <param name="id">The user identifier</param>
-    /// <param name="patchingDocument">The patching document</param>
-    /// <returns>The result for the updated user</returns>
-    Task<Result<UserDto>> PatchUserAsync(int id, JsonPatchDocument<UserDto> patchingDocument);
 }

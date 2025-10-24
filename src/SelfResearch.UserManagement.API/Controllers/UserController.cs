@@ -104,7 +104,7 @@ namespace SelfResearch.UserManagement.API.Controllers
                 return Result.Fail(new ArgumentError(nameof(patchingDocument), "Patching document must have operations.")).ToActionResult();
             }
 
-            var updatedUserResult = await this._userManagementService.PatchUserAsync(id, patchingDocument);
+            var updatedUserResult = await this._updateUserService.PatchUserAsync(id, patchingDocument);
             return updatedUserResult.ToActionResult();
         }
 
